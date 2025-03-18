@@ -1,0 +1,53 @@
+# General
+*.log
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+*.swp
+*.swo
+.DS_Store
+.env
+
+# Python
+*.env
+*.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Django
+backend/*.sqlite3
+backend/db.sqlite3
+backend/media
+backend/staticfiles
+backend/static
+
+# Node
+frontend/node_modules/
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+
+# React
+build/
+coverage/
+
+# Docker
+*.env
+docker-compose.override.yml
+.dockerignore
+
+# VS Code
+.vscode/
+
+# JetBrains
+.idea/
+
+# macOS
+.DS_Store
+
+# Linux
+*~
