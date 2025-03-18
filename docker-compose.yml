@@ -1,4 +1,3 @@
-version: '3.9'
 services:
   db:
     image: postgres:14-alpine
@@ -13,11 +12,11 @@ services:
 
   backend:
     build:
-      context: ./restaurant_backend
+      context: ./backend
       dockerfile: Dockerfile
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
-      - ./restaurant_backend:/app
+      - ./backend:/app
     ports:
       - "8000:8000"
     depends_on:
@@ -25,10 +24,10 @@ services:
 
   frontend:
     build:
-      context: ./restaurant_frontend
+      context: ./frontend
       dockerfile: Dockerfile
     volumes:
-      - ./restaurant_frontend:/app
+      - ./frontend:/app
     ports:
       - "3000:3000"
     depends_on:
