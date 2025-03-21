@@ -4,7 +4,7 @@ from django.db import models
 
 class Menu(models.Model):
     name = models.CharField(max_length=100, blank=False)
-    description = models.CharField(max_length=100, blank=False)
+    description = models.CharField(max_length=500, blank=False)
     image = models.ImageField(upload_to='menu_images/', blank=False, null=False)
 
     def __str__(self):

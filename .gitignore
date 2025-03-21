@@ -21,7 +21,7 @@ venv.bak/
 # Django
 backend/*.sqlite3
 backend/db.sqlite3
-backend/media
+# backend/media
 backend/staticfiles
 backend/static
 

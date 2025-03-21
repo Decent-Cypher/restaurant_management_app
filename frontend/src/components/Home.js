@@ -16,7 +16,7 @@ const Home = () => {
 
   return (
     <div>
-      <h1>hello bro</h1>
+      <h1>hello dmmm</h1>
       <ul>
         {feedback.map(item => (
           <li key={item.id}>{item.comment} - {item.rating}</li>
