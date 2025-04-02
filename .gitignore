@@ -26,7 +26,7 @@ backend/staticfiles
 backend/static
 
 # Node
-frontend/node_modules/
+*/node_modules/
 frontend/npm-debug.log*
 frontend/yarn-debug.log*
 frontend/yarn-error.log*
