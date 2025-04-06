@@ -1,12 +1,12 @@
 import React from 'react';
 
-const About = () => {
+const Menu = () => {
   return (
     <div>
-      <h1>About</h1>
+      <h1>Menu</h1>
       <p>This is the about page.</p>
     </div>
   );
 };
 
-export default About;
+export default Menu;

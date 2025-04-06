@@ -21,8 +21,15 @@ services:
       python manage.py runserver 0.0.0.0:8000"
     environment:
       - DATABASE_SEEDING=True
-    volumes:
-      - ./backend:/app
+    develop:
+      watch:
+        - action: sync
+          path: ./backend
+          target: /app
+          ignore:
+            - requirements.txt
+        - action: rebuild
+          path: ./backend/requirements.txt
     ports:
       - "8000:8000"
     depends_on:
@@ -32,8 +39,15 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    volumes:
-      - ./frontend:/app
+    develop:
+      watch:
+        - action: sync
+          path: ./frontend
+          target: /app
+          ignore:
+            - node_modules/
+        - action: rebuild
+          path: package.json
     ports:
       - "3000:3000"
     depends_on:
