@@ -49,7 +49,7 @@ def remove_order_item(request: HttpResponse) -> JsonResponse:
         order_id = request.POST.get("order_id")
         # Get the order item name and quantity from the request
         item_name = request.POST.get("item_name")
-        quantity = request.POST.get("quantity")
+        quantity = request.POST.get("remove_quantity")
 
         try: 
             order = Order.objects.get(id=order_id)
@@ -80,7 +80,7 @@ def add_note(request: HttpResponse) -> JsonResponse:
     if request.method == "POST":
         # Get the order ID and note from the request
         order_id = request.POST.get("order_id")
-        note = request.POST.get("note")
+        note = request.POST.get("note", "")
 
         # Get the Order instance
         try:
@@ -100,7 +100,7 @@ def choose_service(request: HttpResponse) -> JsonResponse:
     if request.method == "POST":
         # Get the order ID and service options from the request
         order_id = request.POST.get("order_id")
-        service_options = request.POST.get("service_options")
+        service_options = request.POST.get("service_type", "Dine-in") #default to Dine-in
 
         # Get the Order instance
         try:
