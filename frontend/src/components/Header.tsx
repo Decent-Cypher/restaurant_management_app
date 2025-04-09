@@ -39,7 +39,7 @@ export default function Header({ transparent = false }: HeaderProps) {
           <ul className="flex xl:space-x-24 space-x-14 text-xl">
             <li><Link to="/" className={`hover:${isScrolled ? 'text-gray-600' : 'text-gray-300'}`}>Home</Link></li>
             <li><Link to="/menu" className={`hover:${isScrolled ? 'text-gray-600' : 'text-gray-300'}`}>Menu</Link></li>
-            <li><Link to="/orders" className={`hover:${isScrolled ? 'text-gray-600' : 'text-gray-300'}`}>Orders</Link></li>
+            <li><Link to="/order" className={`hover:${isScrolled ? 'text-gray-600' : 'text-gray-300'}`}>Order</Link></li>
             <li><Link to="/login" className={`hover:${isScrolled ? 'text-gray-600' : 'text-gray-300'}`}>Login</Link></li>
           </ul>
         </nav>
@@ -59,7 +59,7 @@ export default function Header({ transparent = false }: HeaderProps) {
           <ul className="flex flex-col space-y-2 mt-2 text-right">
             <li><Link to="/" className={`block hover:${isScrolled ? 'text-gray-600' : 'text-gray-300'}`}>Home</Link></li>
             <li><Link to="/menu" className={`block hover:${isScrolled ? 'text-gray-600' : 'text-gray-300'}`}>Menu</Link></li>
-            <li><Link to="/orders" className={`block hover:${isScrolled ? 'text-gray-600' : 'text-gray-300'}`}>Orders</Link></li>
+            <li><Link to="/order" className={`block hover:${isScrolled ? 'text-gray-600' : 'text-gray-300'}`}>Order</Link></li>
             <li><Link to="/login" className={`block hover:${isScrolled ? 'text-gray-600' : 'text-gray-300'}`}>Login</Link></li>
           </ul>
         </div>

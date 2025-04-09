@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import App from './App'
 import Menu from './Menu'
+import Order from './Order'
 import NotFound from './404'
 
 createRoot(document.getElementById('root')!).render(
@@ -11,7 +12,7 @@ createRoot(document.getElementById('root')!).render(
       <Routes>
         <Route path="/" element={<App />} />
         <Route path="/menu" element={<Menu />} />
-        
+        <Route path="/order" element={<Order />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
