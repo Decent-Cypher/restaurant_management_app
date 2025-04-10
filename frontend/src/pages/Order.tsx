@@ -39,7 +39,7 @@ export default function Order() {
           <div className="w-full md:w-1/3 p-6 bg-white flex flex-col justify-center">
             {/* Welcome Note */}
             <h2 className="text-lg font-bold text-gray-800 text-center mb-2">
-              Welcome to <br /> <span className="text-blue-900">Cooking Mama</span>
+              Welcome to <br /> <span className="text-xl text-blue-900">Cooking Mama</span>
             </h2>
             {/* Service type input field*/}
             <p className="text-sm font-medium text-gray-700 text-center mb-2 mt-8">Choose your service type:</p>
@@ -148,7 +148,7 @@ export default function Order() {
           <div className="bg-white p-6 rounded-2xl shadow-md max-w-2xl mx-auto mt-8">
             {!feedback ? (
               <>
-                <h4 className="font-medium text-sm text-center text-gray-800 mb-4">How is your experience with our service?</h4>
+                <h4 className="font-medium text-sm text-center text-gray-800 mb-4">How was your experience with our service?</h4>
                 <div className="flex justify-around">
                   {["😠", "🙁", "😐", "🙂", "😄"].map((face, idx) => (
                     <button
