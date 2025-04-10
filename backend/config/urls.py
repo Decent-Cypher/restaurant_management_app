@@ -21,9 +21,12 @@ from django.conf.urls.static import static
 from rest_framework.routers import DefaultRouter
 from reviews.views import FeedbackViewSet
 from accounts.views import staff_login, diner_login, logout_view, protected_view
+from menu.views import MenuViewSet, MenuItemViewSet
 
 router = DefaultRouter()
 router.register(r'feedback', FeedbackViewSet)
+router.register(r'menus', MenuViewSet)
+router.register(r'menuitems', MenuItemViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
