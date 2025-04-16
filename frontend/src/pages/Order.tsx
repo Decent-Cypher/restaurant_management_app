@@ -1,5 +1,4 @@
 import Layout from "../components/Layout";
-import bannerImg from "../styles/banner.jpg";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 
@@ -29,7 +28,7 @@ export default function Order() {
           {/* Banner Image with text overlay */}
           <div className="relative w-full md:w-2/3">
             <img
-              src={bannerImg}
+              src="/banner.jpg"
               alt="Seasonal Menu"
               className="w-full h-full object-cover"
             />
