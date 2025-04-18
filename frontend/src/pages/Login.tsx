@@ -123,7 +123,7 @@ export default function Login() {
             <form onSubmit={handleLogin}>
               <div className="mb-4">
                 <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-2">
-                  Username
+                  Email or Username
                 </label>
                 <input
                   type="text"
@@ -132,7 +132,7 @@ export default function Login() {
                   onChange={(e) => setUsername(e.target.value)}
                   required
                   className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
-                  placeholder="Enter your username"
+                  placeholder="Enter your email or username"
                 />
               </div>
               

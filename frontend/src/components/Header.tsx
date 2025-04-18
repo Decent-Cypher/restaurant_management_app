@@ -13,7 +13,7 @@ export default function Header({ transparent = false }: HeaderProps) {
     if (!transparent) return;
     
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > window.innerHeight);
+      setIsScrolled(window.scrollY > window.innerHeight - 80);
     };
     
     window.addEventListener('scroll', handleScroll);
