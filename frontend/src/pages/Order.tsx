@@ -119,15 +119,7 @@ export default function Order() {
         <div className="max-w-6xl mx-auto px-4">
           <h3 className="text-2xl font-bold mb-4 text-gray-800">Menu</h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
-            {
-            menus
-            // [
-            //   "Korean Food",
-            //   "Kimbap",
-            //   "Drinks",
-            //   "Set Menu",
-            // ]
-            .map((menu) => (
+            {menus.map((menu) => (
               <Link
                 key={menu.id}
                 to={`/order/${menu.name.toLowerCase().replace(/ /g, "-")}`}
