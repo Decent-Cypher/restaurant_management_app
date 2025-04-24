@@ -1,13 +1,29 @@
-import Layout from "../components/Layout";
+import OrderLayout from "../components/OrderLayout";
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+
+interface Menu {
+  id: number;
+  name: string;
+  description: string;
+  image: string;
+}
+
+interface MenuItem {
+  id: number;
+  name: string;
+  price: string;
+  image: string;
+  menu: number;
+}
 
 export default function Order() {
   const [serviceType, setServiceType] = useState("");
   const [tableNumber, setTableNumber] = useState("");
   const [tableError, setTableError] = useState("");
   const [feedback, setFeedback] = useState<string | null>(null);
-  const [menuNames, setMenuNames] = useState<string[]>([]);
+  const [menus, setMenus] = useState<Menu[]>([]);
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [showFollowUp, setShowFollowUp] = useState(false);
   const navigate = useNavigate();
 
@@ -24,17 +40,20 @@ export default function Order() {
   useEffect(() => {
     fetch("http://localhost:8000/api/menus/")
       .then((res) => res.json())
-      .then((data) => {
-        const names = data.map((menu: any) => menu.name);
-        setMenuNames(names);
-      })
+      .then((data) => setMenus(data))
       .catch((error) => {
         console.error("Failed to fetch menus:", error);
       });
+
+    fetch("http://localhost:8000/api/menuitems/")
+      .then((res) => res.json())
+      .then((data) => setMenuItems(data))
+      .catch((error) => console.error("Failed to fetch menu items:", error));
+  
   }, []);
 
   return (
-    <Layout title="Order | Cooking Mama">
+    <OrderLayout>
       <div className="bg-[#e5ddce] min-h-screen pb-8 pt-8">
         {/* Single container for both image and welcome note */}
         <div className="flex flex-col md:flex-row gap-6 rounded-2xl overflow-hidden shadow-lg bg-white max-w-[69rem] mx-auto mb-4">
@@ -101,21 +120,25 @@ export default function Order() {
           <h3 className="text-2xl font-bold mb-4 text-gray-800">Menu</h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
             {
-            menuNames
+            menus
             // [
             //   "Korean Food",
             //   "Kimbap",
             //   "Drinks",
             //   "Set Menu",
             // ]
-            .map((category, idx) => (
+            .map((menu) => (
               <Link
-                key={idx}
-                to={`/order/${category.toLowerCase().replace(/ /g, "-")}`}
+                key={menu.id}
+                to={`/order/${menu.name.toLowerCase().replace(/ /g, "-")}`}
                 className="bg-white rounded-lg shadow hover:shadow-lg transition duration-200 p-3 text-center"
               >
-                <div className="h-24 bg-gray-200 mb-2 rounded"></div>
-                <p className="text-sm font-semibold text-gray-700">{category}</p>
+                <img
+                  src={menu.image}
+                  alt={menu.name}
+                  className="h-24 w-full object-cover mb-2 rounded"
+                />
+                <p className="text-sm font-semibold text-gray-700">{menu.name}</p>
               </Link>
             ))}
           </div>
@@ -123,33 +146,16 @@ export default function Order() {
           {/* Popular Dishes */}
           <h3 className="text-2xl font-bold mb-4 text-gray-800">Popular Dishes</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
-            {[
-              {
-                name: "Mì Ý cua và xốt kem cà chua",
-                price: "254,000",
-              },
-              {
-                name: "Pizza 3 loại phô mai nhà làm",
-                price: "198,000",
-              },
-              {
-                name: "Gà rán với gia vị phương Đông, 2 miếng",
-                price: "98,000",
-              },
-              {
-                name: "Pizza 4 loại phô mai nhà làm",
-                price: "248,000",
-              },
-              {
-                name: "Mì Ý bò bằm và phô mai hun khói",
-                price: "168,000",
-              },
-            ].map((item, index) => (
+            {menuItems.slice(0, 5).map((item) => (
               <div
-                key={index}
+                key={item.id}
                 className="bg-white rounded-lg shadow p-4 flex flex-col items-center text-center"
               >
-                <div className="h-32 w-full bg-gray-200 rounded mb-2"></div>
+                <img
+                  src={item.image}
+                  alt={item.name}
+                  className="h-32 w-full object-cover rounded mb-2"
+                />
                 <p className="font-semibold text-gray-700 mb-1">{item.name}</p>
                 <p className="text-sm text-gray-600 mb-2">{item.price} vnđ</p>
                 <button className="bg-white border border-gray-400 rounded-full w-8 h-8 flex items-center justify-center text-xl text-gray-800 shadow">
@@ -203,6 +209,6 @@ export default function Order() {
 
         </div>
       </div>
-    </Layout>
+    </OrderLayout>
   );
 }
