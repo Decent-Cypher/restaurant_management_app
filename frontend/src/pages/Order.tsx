@@ -1,12 +1,13 @@
 import Layout from "../components/Layout";
 import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function Order() {
   const [serviceType, setServiceType] = useState("");
   const [tableNumber, setTableNumber] = useState("");
   const [tableError, setTableError] = useState("");
   const [feedback, setFeedback] = useState<string | null>(null);
+  const [menuNames, setMenuNames] = useState<string[]>([]);
   const [showFollowUp, setShowFollowUp] = useState(false);
   const navigate = useNavigate();
 
@@ -19,6 +20,18 @@ export default function Order() {
       setTableError("");
     }
   };
+
+  useEffect(() => {
+    fetch("http://localhost:8000/api/menus/")
+      .then((res) => res.json())
+      .then((data) => {
+        const names = data.map((menu: any) => menu.name);
+        setMenuNames(names);
+      })
+      .catch((error) => {
+        console.error("Failed to fetch menus:", error);
+      });
+  }, []);
 
   return (
     <Layout title="Order | Cooking Mama">
@@ -87,12 +100,15 @@ export default function Order() {
         <div className="max-w-6xl mx-auto px-4">
           <h3 className="text-2xl font-bold mb-4 text-gray-800">Menu</h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
-            {[
-              "Korean Food",
-              "Kimbap",
-              "Drinks",
-              "Set Menu",
-            ].map((category, idx) => (
+            {
+            menuNames
+            // [
+            //   "Korean Food",
+            //   "Kimbap",
+            //   "Drinks",
+            //   "Set Menu",
+            // ]
+            .map((category, idx) => (
               <Link
                 key={idx}
                 to={`/order/${category.toLowerCase().replace(/ /g, "-")}`}

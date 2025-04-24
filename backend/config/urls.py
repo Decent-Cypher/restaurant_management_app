@@ -24,7 +24,7 @@ from accounts.views import staff_login, diner_login, logout_view, protected_view
 from menu.views import MenuViewSet, MenuItemViewSet
 
 router = DefaultRouter()
-router.register(r'feedback', FeedbackViewSet)
+# router.register(r'feedback', FeedbackViewSet)
 router.register(r'menus', MenuViewSet)
 router.register(r'menuitems', MenuItemViewSet)
 
