@@ -31,8 +31,8 @@ router.register(r'menuitems', MenuItemViewSet)
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
-    path('api/staff-login/', staff_login),
-    path('api/diner-login/', diner_login),
-    path('api/logout/', logout_view),
-    path('api/protected', protected_view),
+    path('api/staff-login/', staff_login, name='staff-login'),
+    path('api/diner-login/', diner_login, name='diner-login'),
+    path('api/logout/', logout_view, name='logout'),
+    path('api/protected', protected_view, name='protected'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
