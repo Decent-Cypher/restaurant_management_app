@@ -1,0 +1,8 @@
+{
+    "reportImplicitRelativeImport": "none",
+    "reportUnknownMemberType": "none",
+    "reportUnknownVariableType": "none",
+    "reportMissingTypeStubs": "none",
+    
+    "reportAttributeAccessIssue": "none"
+}
