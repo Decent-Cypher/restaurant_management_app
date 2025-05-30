@@ -19,20 +19,50 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from rest_framework.routers import DefaultRouter
-from reviews.views import FeedbackViewSet
-from accounts.views import staff_login, diner_login, logout_view, protected_view
-from menu.views import MenuViewSet, MenuItemViewSet
 
-router = DefaultRouter()
-# router.register(r'feedback', FeedbackViewSet)
-router.register(r'menus', MenuViewSet)
-router.register(r'menuitems', MenuItemViewSet)
+# Import views from all apps
+from accounts import views as account_views
+from menu import views as menu_views
+from orders import views as order_views
+from reviews import views as review_views
+# from analytics import views as analytics_views # Uncomment when analytics views are ready
+
+# Routers for ViewSets
+menu_router = DefaultRouter()
+menu_router.register(r'menus', menu_views.MenuViewSet, basename='menu')
+menu_router.register(r'menu-items', menu_views.MenuItemViewSet, basename='menuitem')
+
+review_router = DefaultRouter()
+review_router.register(r'feedbacks', review_views.FeedbackViewSet, basename='feedback')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include(router.urls)),
-    path('api/staff-login/', staff_login, name='staff-login'),
-    path('api/diner-login/', diner_login, name='diner-login'),
-    path('api/logout/', logout_view, name='logout'),
-    path('api/protected', protected_view, name='protected'),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+    # Accounts URLs
+    path('api/accounts/staff/login/', account_views.staff_login, name='staff_login'),
+    path('api/accounts/diner/login/', account_views.diner_login, name='diner_login'),
+    path('api/accounts/logout/', account_views.logout_view, name='logout'),
+    path('api/accounts/protected/', account_views.protected_view, name='protected_view'),
+
+    # Menu URLs (using router)
+    path('api/menu/', include(menu_router.urls)),
+
+    # Orders URLs
+    path('api/orders/items/add/', order_views.add_order_item, name='add_order_item'),
+    path('api/orders/items/remove/', order_views.remove_order_item, name='remove_order_item'),
+    path('api/orders/note/add/', order_views.add_note, name='add_note'),
+    path('api/orders/service/choose/', order_views.choose_service, name='choose_service'),
+    path('api/orders/submit/', order_views.submit_order, name='submit_order'),
+    path('api/orders/update/', order_views.update_order, name='update_order'),
+    path('api/orders/status/update/', order_views.update_order_status_by_staff, name='update_order_status_by_staff'),
+    path('api/orders/status/<int:order_id>/', order_views.get_order_status, name='get_order_status'),
+    path('api/orders/diner/<int:diner_id>/', order_views.get_diner_orders, name='get_diner_orders'),
+    path('api/orders/all/', order_views.get_all_orders, name='get_all_orders'),
+    path('api/orders/kitchen/', order_views.get_kitchen_orders, name='get_kitchen_orders'),
+
+    # Reviews URLs (using router)
+    path('api/reviews/', include(review_router.urls)),
+
+    # Analytics URLs (add paths here when views are created)
+    # path('api/analytics/...', analytics_views.some_view, name='some_analytics_view'),
+]
