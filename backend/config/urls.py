@@ -42,7 +42,7 @@ urlpatterns = [
     path('api/accounts/staff/login/', account_views.staff_login, name='staff_login'),
     path('api/accounts/diner/login/', account_views.diner_login, name='diner_login'),
     path('api/accounts/logout/', account_views.logout_view, name='logout'),
-    path('api/accounts/protected/', account_views.protected_view, name='protected_view'),
+    path('api/accounts/protected/', account_views.protected_view, name='protected'),
 
     # Menu URLs (using router)
     path('api/menu/', include(menu_router.urls)),
@@ -65,4 +65,4 @@ urlpatterns = [
 
     # Analytics URLs (add paths here when views are created)
     # path('api/analytics/...', analytics_views.some_view, name='some_analytics_view'),
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

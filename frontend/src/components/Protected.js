@@ -7,7 +7,7 @@ const Protected = () => {
   const getProtected = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch('http://localhost:8000/api/protected', {
+      const response = await fetch('http://localhost:8000/api/accounts/protected', {
         method: 'GET',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         credentials: 'include',

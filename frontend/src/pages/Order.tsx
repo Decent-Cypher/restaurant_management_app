@@ -38,14 +38,14 @@ export default function Order() {
   };
 
   useEffect(() => {
-    fetch("http://localhost:8000/api/menus/")
+    fetch("http://localhost:8000/api/menu/menus/")
       .then((res) => res.json())
       .then((data) => setMenus(data))
       .catch((error) => {
         console.error("Failed to fetch menus:", error);
       });
 
-    fetch("http://localhost:8000/api/menuitems/")
+    fetch("http://localhost:8000/api/menu/menu-items/")
       .then((res) => res.json())
       .then((data) => setMenuItems(data))
       .catch((error) => console.error("Failed to fetch menu items:", error));

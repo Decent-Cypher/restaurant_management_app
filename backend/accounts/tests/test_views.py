@@ -8,14 +8,14 @@ def test_staff_login_success(client):
     staff.set_password("securepassword")
     staff.save()
 
-    response = client.post(reverse('staff-login'), {'username': 'Alice', 'password': 'securepassword'})
+    response = client.post(reverse('staff_login'), {'username': 'Alice', 'password': 'securepassword'})
     assert response.status_code == 200
     assert response.json()['success'] is True
     assert client.session.get('staff_id') == staff.id
 
 @pytest.mark.django_db
 def test_staff_login_failure(client):
-    response = client.post(reverse('staff-login'), {'username': 'NonExistent', 'password': 'nopassword'})
+    response = client.post(reverse('staff_login'), {'username': 'NonExistent', 'password': 'nopassword'})
     assert response.status_code == 400
     assert response.json()['success'] is False
 
@@ -25,14 +25,14 @@ def test_diner_login_success(client):
     diner.set_password("dinerpassword")
     diner.save()
 
-    response = client.post(reverse('diner-login'), {'username': 'Bob', 'password': 'dinerpassword'})
+    response = client.post(reverse('diner_login'), {'username': 'Bob', 'password': 'dinerpassword'})
     assert response.status_code == 200
     assert response.json()['success'] is True
     assert client.session.get('diner_id') == diner.id
 
 @pytest.mark.django_db
 def test_diner_login_failure(client):
-    response = client.post(reverse('diner-login'), {'username': 'Unknown', 'password': 'wrong'})
+    response = client.post(reverse('diner_login'), {'username': 'Unknown', 'password': 'wrong'})
     assert response.status_code == 400
     assert response.json()['success'] is False
 
@@ -55,7 +55,7 @@ def test_protected_view_staff(client):
     staff = Staff.objects.create(name="Alice", role="Manager", email="alice@example.com")
     staff.set_password("securepassword")
     staff.save()
-    client.post(reverse('staff-login'), {'username': 'Alice', 'password': 'securepassword'})
+    client.post(reverse('staff_login'), {'username': 'Alice', 'password': 'securepassword'})
 
     response = client.get(reverse('protected'))
     assert response.status_code == 200
@@ -66,7 +66,7 @@ def test_protected_view_diner(client):
     diner = Diner.objects.create(name="Bob", email="bob@example.com", phone_num="1234567890")
     diner.set_password("dinerpassword")
     diner.save()
-    client.post(reverse('diner-login'), {'username': 'Bob', 'password': 'dinerpassword'})
+    client.post(reverse('diner_login'), {'username': 'Bob', 'password': 'dinerpassword'})
 
     response = client.get(reverse('protected'))
     assert response.status_code == 200

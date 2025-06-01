@@ -7,7 +7,7 @@ beforeEach(() => {
     if (url.includes('/menus/')) {
       return Promise.resolve({ json: () => Promise.resolve([{ id: 1, name: 'Pizza', image: 'pizza.jpg', description: 'desc' }]) });
     }
-    if (url.includes('/menuitems/')) {
+    if (url.includes('/menu-items/')) {
       return Promise.resolve({ json: () => Promise.resolve([{ id: 1, name: 'Margherita', price: '10000', image: 'm.jpg', menu: 1 }]) });
     }
     return Promise.reject('Unknown API');
