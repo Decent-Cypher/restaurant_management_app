@@ -1,7 +1,21 @@
 import OrderLayout from "./OrderLayout";
 import Cart from "./Cart";
 
-export default function OrderSubpageLayout() {
+interface MenuItem {
+  id: number;
+  name: string;
+  price: string;
+  image: string;
+  menu: number;
+}
+
+interface MenuLayoutProps {
+  menu: string;
+  categories: string[];
+  items: MenuItem[];
+}
+
+export default function OrderSubpageLayout({ menu, categories, items }: MenuLayoutProps) {
   return (
     <OrderLayout>
       {/* Main content layout */}
@@ -9,11 +23,14 @@ export default function OrderSubpageLayout() {
         {/* Menu */}
         <div className="text-sm text-gray-700 font-medium flex-1"> 
           {/*Bread crumb*/}
-          <span className="text-blue-600 cursor-pointer">Order</span> &gt; Drinks
+          <span className="text-blue-600 cursor-pointer">Order</span> &gt; {menu}
           {/* Menu list */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6 mt-6">
-            {['Drinks', 'Combo', 'Food', 'Snacks'].map((name) => (
-              <div className="bg-white rounded-lg shadow hover:shadow-lg transition duration-200 p-3 text-center text-sm font-semibold text-gray-700"> {name}
+            {categories.map((name, idx) => (
+              <div 
+                key={idx}
+                className="bg-white rounded-lg shadow hover:shadow-lg transition duration-200 p-3 text-center text-sm font-semibold text-gray-700"> 
+                {name}
               </div>
             ))}
           </div>
@@ -23,38 +40,16 @@ export default function OrderSubpageLayout() {
           {/* Menu items */}
 
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-6">
-            {[
-              {
-                name: "Mì Ý cua và xốt kem cà chua",
-                price: "254,000",
-              },
-              {
-                name: "Pizza 3 loại phô mai nhà làm",
-                price: "198,000",
-              },
-              {
-                name: "Gà rán với gia vị phương Đông, 2 miếng",
-                price: "98,000",
-              },
-              {
-                name: "Pizza 4 loại phô mai nhà làm",
-                price: "248,000",
-              },
-              {
-                name: "Mì Ý bò bằm và phô mai hun khói",
-                price: "168,000",
-              },
-            ]
-            .map((item) => (
+            {items.map((item) => (
               <div
-                // key={item.id}
+                key={item.id}
                 className="bg-white rounded-lg shadow p-4 flex flex-col items-center text-center"
               >
-                {/* <img
+                <img
                   src={item.image}
                   alt={item.name}
                   className="h-32 w-full object-cover rounded mb-2"
-                /> */}
+                />
                 <div className="w-full aspect-square object-cover rounded mb-2"/>
                 <p className="font-semibold text-gray-700 mb-1">{item.name}</p>
                 <p className="text-sm text-gray-600 mb-2">{item.price} vnđ</p>
