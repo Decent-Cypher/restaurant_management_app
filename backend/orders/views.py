@@ -18,19 +18,23 @@ def add_order_item(request: HttpResponse) -> JsonResponse:
     if request.method == "POST":
         # Get the order ID and item details from the request
         order_id = request.POST.get("order_id")
-        item_name = request.POST.get("item_name")
+        item_id = request.POST.get("item_id")  # Changed from item_name to item_id
         item_quantity = request.POST.get("item_quantity")
         
         try:
             order = Order.objects.get(id=order_id)
+            try:
+                menu_item = MenuItem.objects.get(id=item_id)
+            except MenuItem.DoesNotExist:
+                return JsonResponse({"status": "error", "message": "Menu item not found"}, status=404)
             # Create a new OrderItem instance
             order_item = OrderItem(
                 order=order,
-                menu_item=item_name,  # Assuming item_name is used to fetch the MenuItem (adjust if necessary)
+                menu_item=menu_item,
                 quantity=item_quantity,
             )
             order_item.save()
-            order.total_price += order_item.menu_item.price * int(item_quantity)
+            order.total_price += menu_item.price * int(item_quantity)
             order.last_modified = timezone.now()
             order.save()
             return JsonResponse({"status": "success", "item": order_item.id, "order": order.id})
@@ -49,7 +53,7 @@ def remove_order_item(request: HttpResponse) -> JsonResponse:
         
     if request.method == "POST":
         order_id = request.POST.get("order_id")
-        item_name = request.POST.get("item_name")
+        item_id = request.POST.get("item_id")  # Changed from item_name to item_id
         quantity = request.POST.get("remove_quantity")
         
         try:
@@ -60,8 +64,7 @@ def remove_order_item(request: HttpResponse) -> JsonResponse:
         try: 
             order = Order.objects.get(id=order_id)
             try:
-                # Assuming MenuItem has a 'name' field to filter by
-                order_item = OrderItem.objects.get(menu_item__name=item_name, order=order)
+                order_item = OrderItem.objects.get(menu_item__id=item_id, order=order)
                 if order_item.quantity <= quantity:
                     order.total_price -= order_item.menu_item.price * order_item.quantity
                     order_item.delete()
@@ -121,7 +124,7 @@ def choose_service(request: HttpResponse) -> JsonResponse:
     return JsonResponse({"status": "error", "message": "Invalid request method"})
 
 @csrf_exempt
-def submit_order(request) -> JsonResponse:
+def submit_order(request: HttpResponse) -> JsonResponse:
     """
     Submit the order for processing
     """
@@ -133,7 +136,7 @@ def submit_order(request) -> JsonResponse:
         diner_id = request.POST.get("diner_id")
         service_type = request.POST.get("service_type", "Dine-in")  # default to Dine-in
         note = request.POST.get("note", "")
-        address = request.POST.get("address", "")  # Optional, for delivery orders
+        # address = request.POST.get("address", "")  # Optional, for delivery orders
         ordered_items = request.POST.getlist("ordered_items")  # expecting list of item IDs
         quantities = request.POST.getlist("quantities")         # matching list of quantities
         
@@ -173,7 +176,7 @@ def submit_order(request) -> JsonResponse:
     return JsonResponse({"status": "error", "message": "Invalid request method"})
 
 @csrf_exempt
-def update_order(request) -> JsonResponse:
+def update_order(request: HttpResponse) -> JsonResponse:
     """
     Update the order details (e.g. items, quantities, note) by a diner before it's processed.
     Assumes the order status allows modification (e.g., 'PENDING').
@@ -239,18 +242,24 @@ def update_order(request) -> JsonResponse:
     return JsonResponse({"status": "error", "message": "Invalid request method"}, status=405)
 
 @csrf_exempt
-def get_order_status(request, order_id: int) -> JsonResponse:
+def get_order_status(request: HttpResponse) -> JsonResponse:
     """
     Get the status and details of a specific order.
     Diners can only see their own orders. Staff might see any.
     """
     if "diner_id" in request.session:
         try:
+            order_id = request.GET.get("order_id")
+            if not order_id:
+                return JsonResponse({"status": "error", "message": "Order ID is required"}, status=400)
             order = Order.objects.get(id=order_id, diner_id=request.session["diner_id"])
         except Order.DoesNotExist:
             return JsonResponse({"status": "error", "message": "Order not found or not authorized"}, status=404)
     elif "staff_id" in request.session: # Assuming staff can view any order
         try:
+            order_id = request.GET.get("order_id")
+            if not order_id:
+                return JsonResponse({"status": "error", "message": "Order ID is required"}, status=400)
             order = Order.objects.get(id=order_id)
         except Order.DoesNotExist:
             return JsonResponse({"status": "error", "message": "Order not found"}, status=404)
@@ -273,7 +282,7 @@ def get_order_status(request, order_id: int) -> JsonResponse:
     return JsonResponse({"status": "error", "message": "Invalid request method"}, status=405)
 
 @csrf_exempt
-def update_order_status_by_staff(request) -> JsonResponse:
+def update_order_status_by_staff(request: HttpResponse) -> JsonResponse:
     """
     Update the status of an order (e.g., from PENDING to COMPLETED).
     This action should be restricted to staff members.
@@ -305,12 +314,15 @@ def update_order_status_by_staff(request) -> JsonResponse:
     return JsonResponse({"status": "error", "message": "Invalid request method"}, status=405)
 
 @csrf_exempt
-def get_diner_orders(request, diner_id: int) -> JsonResponse:
+def get_diner_orders(request: HttpResponse) -> JsonResponse:
     """
     Get all orders for a specific diner.
     Ensures the logged-in diner can only access their own orders, or staff can access.
     """
     # Security check: Logged-in diner must match diner_id or be staff
+    diner_id = request.GET.get("diner_id")
+    if not diner_id:
+        return JsonResponse({"status": "error", "message": "Diner ID is required"}, status=400)
     if "diner_id" in request.session and request.session["diner_id"] == diner_id:
         pass # Diner is accessing their own orders
     elif "staff_id" in request.session:
@@ -338,7 +350,7 @@ def get_diner_orders(request, diner_id: int) -> JsonResponse:
     return JsonResponse({"status": "error", "message": "Invalid request method"}, status=405)
 
 @csrf_exempt
-def get_all_orders(request) -> JsonResponse:
+def get_all_orders(request: HttpResponse) -> JsonResponse:
     """
     Get all orders. Restricted to staff members.
     """
@@ -363,7 +375,7 @@ def get_all_orders(request) -> JsonResponse:
     return JsonResponse({"status": "error", "message": "Invalid request method"}, status=405)
 
 @csrf_exempt
-def get_kitchen_orders(request) -> JsonResponse:
+def get_kitchen_orders(request: HttpResponse) -> JsonResponse:
     """
     Get orders relevant to the kitchen (e.g., PENDING, PREPARING).
     Restricted to staff members.
@@ -391,7 +403,7 @@ def get_kitchen_orders(request) -> JsonResponse:
 
 # Example of a view for processing payments (not fully detailed in urls.py yet)
 @csrf_exempt
-def process_payment(request) -> JsonResponse:
+def process_payment(request: HttpResponse) -> JsonResponse:
     if "diner_id" not in request.session:
          return JsonResponse({"status": "error", "message": "Not authorized"}, status=403)
 
