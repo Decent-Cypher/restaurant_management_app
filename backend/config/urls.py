@@ -59,7 +59,7 @@ urlpatterns = [
     path('api/orders/diner/<int:diner_id>/', order_views.get_diner_orders, name='get_diner_orders'),
     path('api/orders/all/', order_views.get_all_orders, name='get_all_orders'),
     path('api/orders/kitchen/', order_views.get_kitchen_orders, name='get_kitchen_orders'),
-
+    path('api/orders/pay/', order_views.process_payment, name='pay_for_order'),
     # Reviews URLs (using router)
     path('api/reviews/', include(review_router.urls)),
 
