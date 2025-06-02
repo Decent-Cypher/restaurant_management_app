@@ -18,8 +18,8 @@ def add_order_item(request: HttpResponse) -> JsonResponse:
     if request.method == "POST":
         # Get the order ID and item details from the request
         order_id = request.POST.get("order_id")
-        item_id = request.POST.get("item_id")  # Changed from item_name to item_id
-        item_quantity = request.POST.get("item_quantity")
+        item_id = request.POST.get("item_id")
+        item_quantity = request.POST.get("quantity")
         
         try:
             order = Order.objects.get(id=order_id)
@@ -54,7 +54,7 @@ def remove_order_item(request: HttpResponse) -> JsonResponse:
     if request.method == "POST":
         order_id = request.POST.get("order_id")
         item_id = request.POST.get("item_id")  # Changed from item_name to item_id
-        quantity = request.POST.get("remove_quantity")
+        quantity = request.POST.get("quantity")
         
         try:
             quantity = int(quantity)
