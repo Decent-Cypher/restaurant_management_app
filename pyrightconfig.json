@@ -3,7 +3,7 @@
     "reportUnknownMemberType": "none",
     "reportUnknownVariableType": "none",
     "reportMissingTypeStubs": "none",
-    "reportUnkownArgumentType": "none",
+    "reportUnknownArgumentType": "none",
     "reportAny": "none",
     "reportAttributeAccessIssue": "none"
 }

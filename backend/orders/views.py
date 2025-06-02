@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
+from pytest import Session
 from .models import Order, OrderItem, Payment
 from menu.models import MenuItem
 from accounts.models import Diner
@@ -321,6 +322,10 @@ def get_diner_orders(request: HttpResponse) -> JsonResponse:
     """
     # Security check: Logged-in diner must match diner_id or be staff
     diner_id = request.GET.get("diner_id")
+    try:
+        diner_id = int(diner_id) if diner_id else None
+    except ValueError:
+        return JsonResponse({"status": "error", "message": "Invalid diner ID"}, status=400)
     if not diner_id:
         return JsonResponse({"status": "error", "message": "Diner ID is required"}, status=400)
     if "diner_id" in request.session and request.session["diner_id"] == diner_id:
