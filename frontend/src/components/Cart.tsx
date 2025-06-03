@@ -7,7 +7,7 @@ interface CartProps {
 }
 
 export default function Cart({items}: CartProps) {
-  const {calculateTotal} = useCart();
+  const {calculateSubTotal} = useCart();
   
   return (
     <div className="bg-transparent p-4 rounded-lg">
@@ -16,12 +16,11 @@ export default function Cart({items}: CartProps) {
         <CartItemLayout item={item} />
       ))}
 
-
       {/* Footer Button */}
       <div className="bg-[#242e56] text-white rounded-full p-3 mt-2 flex items-center justify-between px-6 shadow-md">
-        <span className="text-sm font-medium"> {calculateTotal().toLocaleString()} vnđ</span>
+        <span className="text-sm font-medium"> {calculateSubTotal().toLocaleString()} VND</span>
         <button className="font-semibold text-sm flex items-center gap-1">
-          Xem giỏ hàng <span className="ml-1">➝</span>
+          View cart <span className="ml-1">➝</span>
         </button>
       </div>
     </div>

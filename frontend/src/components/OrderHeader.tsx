@@ -1,6 +1,9 @@
 import { Search, User, Globe, ShoppingCart } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 export default function OrderHeader() {
+  const navigate = useNavigate();
+
   return (
     <header className="sticky top-[83px] z-40 bg-[#242e56] text-white px-6 py-3 flex items-center justify-between">
       {/* Left: Search Bar */}
@@ -23,7 +26,7 @@ export default function OrderHeader() {
           <span className="text-white">English</span>
         </div> */}
         <div className="relative">
-          <ShoppingCart className="w-6 h-6" />
+          <ShoppingCart onClick={() => navigate("/order/cart")} className="w-6 h-6" />
           {/* <span className="absolute -top-2 -right-2 bg-red-500 text-xs text-white w-5 h-5 rounded-full flex items-center justify-center">
             2
           </span> */}

@@ -8,6 +8,9 @@ interface CartContextType {
   clearCart: () => void;
   calculateTotal: () => number;
   decreaseQuantity: (id: number) => void;
+  calculateSubTotal: () => number;
+  calculateTax: () => number;
+  getTotalQuantity: () => number;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -49,7 +52,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     setCartItems([]);
   };
 
-  const calculateTotal = () => {
+  const calculateSubTotal = () => {
     return cartItems.reduce((total, item) => {
       const price = parseFloat(item.price.replace(/[^0-9.-]+/g, '')); // Handle prices with "vnđ"
       return total + price * item.quantity;
@@ -66,8 +69,25 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     );
   };
 
+  const getTotalQuantity = () => {
+    return cartItems.reduce((total, item) => total + item.quantity, 0);
+  }
+
+  const calculateTax = () => {
+    const total = calculateSubTotal();
+    const taxRate = 0.08; // Example tax rate of 10%
+    return total * taxRate;
+  }
+
+  const calculateTotal = () => {
+    const subTotal = calculateSubTotal();
+    const tax = calculateTax();
+    const deliveryFee = 0; // Assuming free delivery for simplicity
+    return subTotal + tax + deliveryFee;
+  }
+
   return (
-    <CartContext.Provider value={{ cartItems, addToCart, removeFromCart, clearCart, calculateTotal, decreaseQuantity }}>
+    <CartContext.Provider value={{ cartItems, addToCart, removeFromCart, clearCart, calculateSubTotal, decreaseQuantity, calculateTax, calculateTotal, getTotalQuantity}}>
       {children}
     </CartContext.Provider>
   );
