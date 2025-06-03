@@ -1,4 +1,9 @@
 import { Plus, Minus, X, Info } from 'lucide-react';
+import { CartItem } from '../types';
+
+interface CartProps {
+  items: CartItem[];
+}
 
 export default function Cart() {
   return (
