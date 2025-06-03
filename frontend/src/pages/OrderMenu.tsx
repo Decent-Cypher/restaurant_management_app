@@ -4,14 +4,16 @@ import OrderLayout from "../components/OrderLayout";
 import Cart from "../components/Cart";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, MenuItem } from "../types";
+import { useCart } from '../contexts/CartContext';
+
 
 export default function OrderMenu() {
   const location = useLocation();
   const selectedCategory = location.state?.category || "Korean Food Menu";
-
   const [menus, setMenus] = useState<Menu[]>([]);
   const [allMenuItems, setAllMenuItems] = useState<MenuItem[]>([]);
   const [filteredItems, setFilteredItems] = useState<MenuItem[]>([]);
+  const { cartItems } = useCart();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -65,7 +67,7 @@ export default function OrderMenu() {
       {/* Right Panel (Cart) */}
       <div className="w-full max-w-sm shrink-0">
         <h2 className="text-xl font-bold text-[#242e56] ml-4">My Cart</h2>
-        <Cart />
+        <Cart items={cartItems}/>
       </div>
     </div>
   </OrderLayout>
