@@ -48,7 +48,7 @@ export default function OrderMenu() {
     <div className="px-8 pt-6 pb-8 flex gap-6 items-start">
       {/* Left Panel */}
       <div className="flex-1">
-        {/* Top row: breadcrumb + cart title */}
+        {/* Top row: breadcrumb + menu title */}
         <div className="flex justify-between items-center mb-6">
           <div className="text-sm text-gray-700 font-medium">
             <Link to="/order">
