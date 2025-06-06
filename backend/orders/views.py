@@ -7,6 +7,29 @@ from .models import Order, OrderItem, Payment
 from menu.models import MenuItem
 from accounts.models import Diner
 
+
+def get_order_by_id(request: HttpResponse) -> JsonResponse:
+    """
+    Get specific order by ID.
+    """
+    if request.method == "GET":
+        order_id = request.GET.get("order_id")
+        try:
+            order = Order.objects.get(id=order_id)
+        except Order.DoesNotExist:
+            return JsonResponse({"status": "error", "message": "Order not found"}, status=404)
+
+        return JsonResponse({"status": "success",
+                             "order_id": order.id,
+                             "service_type": order.service_type,
+                             "status": order.status,
+                             "total_price": order.total_price,
+                             "note": order.note,
+                             "time_created": order.time_created.strftime('%Y-%m-%d %H:%M:%S'),
+                             "last_modified": order.last_modified.strftime('%Y-%m-%d %H:%M:%S')}, 
+                             status=200)
+    return JsonResponse({"status": "error", "message": "Invalid request method"}, status=405)
+
 @csrf_exempt
 def add_order_item(request: HttpResponse) -> JsonResponse:
     """
