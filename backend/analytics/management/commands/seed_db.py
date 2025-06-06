@@ -250,6 +250,17 @@ class Command(BaseCommand):
             # Example seeding for Feedback
             feedback_mbappe = Feedback.objects.create(order=order_mbappe, rating=5, comment="Great service!")
             feedback_messi = Feedback.objects.create(order=order_messi, rating=4, comment="The food was delicious, but the drinks were too sweet.")
+            list_generated_feedbacks = []
+            for _ in range(1412):
+                # Randomly select one of the orders created above (no comment, and the distribution will be [0.1, 0.05, 0.14, 0.31, 0.4]). The time created will be random within the last 365 days. They won't be associated with any order.
+                list_generated_feedbacks.append(
+                    Feedback(
+                        rating=random.choices([1, 2, 3, 4, 5], weights=[10, 5, 14, 31, 40])[0],
+                        comment="",
+                        time_created=get_random_datetime()
+                    )
+                )
+            Feedback.objects.bulk_create(list_generated_feedbacks)
             
             self.stdout.write(self.style.SUCCESS('Database seeded successfully.'))
         else:
