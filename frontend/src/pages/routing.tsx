@@ -9,6 +9,7 @@ import Login from './Login'
 import OrderMenu from './OrderMenu'
 import CartSummary from './CartSummary'
 import OrderConfirmation from './OrderConfirmation'
+import Payment from './Payment'
 import { CartProvider } from '../contexts/CartContext'; 
 
 const rootElement = document.getElementById('root');
@@ -24,6 +25,7 @@ if (rootElement) {
             <Route path="/order/menu" element={<OrderMenu />} />
             <Route path="/order/cart" element={<CartSummary />} />
             <Route path="/order/confirmation/:orderId" element={<OrderConfirmation />} />
+            <Route path="/order/payment/:orderId" element={<Payment />} />
             <Route path="/login" element={<Login />} />
             <Route path="*" element={<NotFound />} />
           </Routes>

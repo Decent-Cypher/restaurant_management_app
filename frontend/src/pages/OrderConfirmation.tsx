@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useCart } from '../contexts/CartContext';
 import type { ServiceType } from '../contexts/CartContext';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import OrderLayout from '../components/OrderLayout';
+import Layout from '../components/Layout';
 import OrderedItemLayout from '../components/OrderedItemLayout';
 import { CartItem, Order } from '../types';
 
@@ -67,7 +67,7 @@ export default function OrderConfirmation() {
   }
 
   return (
-    <OrderLayout>
+    <Layout title='Order Confirmation'>
       <div className="px-8 pt-6 pb-8 flex gap-6 items-start">
         <div className="flex-1">
           <div className="flex justify-between items-center mb-6 ">
@@ -160,7 +160,7 @@ export default function OrderConfirmation() {
           </div>
         </div>
       </div>
-    </OrderLayout>
+    </Layout>
   );
 }
 

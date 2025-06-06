@@ -274,7 +274,7 @@ export default function CartSummary() {
 
               <button
                 onClick={() => setShowCancelConfirm(true)}
-                className="w-full flex justify-center items-center border border-blue-600 text-blue-600 bg-white px-4 py-3 rounded-full font-semibold text-sm mt-2">
+                className="w-full text-center text-sm text-blue-600 font-semibold mt-3">
                 Cancel
               </button>
             </div>
