@@ -18,7 +18,7 @@ export default function CartSummary() {
   const [note, setNote] = useState("");
   const [addressError, setAddressError] = useState<string | null>(null);
   const [tableError, setTableError] = useState("");
-
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false);
 
   // UI state
   const [editingServiceType, setEditingServiceType] = useState(false);
@@ -30,8 +30,22 @@ export default function CartSummary() {
   };
 
   const handleCheckout = async () => {
-    if (serviceType === 'Delivery' && (!address || addressError)) return;
-    if (serviceType === 'Dine-in' && (!tableNumber || tableError)) return;
+    if (!serviceType) {
+      alert("Please select a service type");
+      return;
+    }
+    if (serviceType === 'Delivery' && (!address || addressError)) {
+      alert("Please enter a valid delivery address");
+      return;
+    }
+    if (serviceType === 'Dine-in' && (!tableNumber || tableError)) {
+      alert("Please enter a valid table number (1-20)");
+      return;
+    }
+    if (cartItems.length === 0) {
+      alert("Your cart is empty. Please add items before checking out.");
+      return;
+    }
 
     setIsCheckout(true);
 
@@ -49,7 +63,7 @@ export default function CartSummary() {
     quantities.forEach(qty => formData.append('quantities', qty.toString()));
 
     try {
-      const res = await fetch('/api/orders/submit/', {
+      const res = await fetch('http://localhost:8000/api/orders/submit/', {
         method: 'POST',
         body: formData,
       });
@@ -58,15 +72,14 @@ export default function CartSummary() {
 
       if (res.ok && data.status === 'success') {
         clearCart();
-        console.error('Success:', data);
-        alert(`✅ Order submitted successfully! Your order ID is ${data.order_id}`);
+        navigate(`/order/confirmation/${data.order_id}`);
       } else {
         console.error('Order submission failed:', data);
-        alert(`Failed to submit order. Please try again. ${data.message || ''}`);
+        alert(`Failed to submit order. Please try again. Error message: ${data.message || ''}`);
       }
     } catch (error) {
       console.error('Checkout error:', error);
-      alert(`An unexpected error occurred during checkout. ${error.message || ''}`);
+      alert(`An unexpected error occurred during checkout. Error message: ${error.message || ''}`);
     } finally {
       setIsCheckout(false);
     }
@@ -260,13 +273,7 @@ export default function CartSummary() {
               </button>
 
               <button
-                onClick={clearCart}
-                className="w-full flex justify-center items-center border border-blue-600 text-blue-600 bg-white px-4 py-3 rounded-full font-semibold text-sm mt-2">
-                Clear Cart
-              </button>
-
-              <button
-                onClick={() => navigate('/order')}
+                onClick={() => setShowCancelConfirm(true)}
                 className="w-full flex justify-center items-center border border-blue-600 text-blue-600 bg-white px-4 py-3 rounded-full font-semibold text-sm mt-2">
                 Cancel
               </button>
@@ -274,6 +281,33 @@ export default function CartSummary() {
           </div>
         </div>
       </div>
+      {showCancelConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-black/30">
+          <div className="bg-white p-6 rounded-2xl shadow-xl max-w-sm w-full text-center">
+            <p className="text-gray-800 font-semibold mb-4">
+              Your order will not be saved. Are you sure you want to cancel?
+            </p>
+            <div className="flex justify-center gap-4">
+              <button
+                onClick={() => {
+                  clearCart();
+                  setShowCancelConfirm(false);
+                  navigate('/order');
+                }}
+                className="bg-red-600 text-white px-4 py-2 rounded-full font-semibold hover:bg-red-700"
+              >
+                Yes, Cancel
+              </button>
+              <button
+                onClick={() => setShowCancelConfirm(false)}
+                className="border border-gray-400 text-gray-700 px-4 py-2 rounded-full font-semibold hover:bg-gray-100"
+              >
+                No, Go Back
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </OrderLayout>
   );
 }
