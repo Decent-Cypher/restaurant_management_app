@@ -11,6 +11,7 @@ import CartSummary from './CartSummary'
 import OrderConfirmation from './OrderConfirmation'
 import Payment from './Payment'
 import { CartProvider } from '../contexts/CartContext'; 
+import FeedbackPage from './Feedback'
 
 const rootElement = document.getElementById('root');
 if (rootElement) {
@@ -26,6 +27,7 @@ if (rootElement) {
             <Route path="/order/cart" element={<CartSummary />} />
             <Route path="/order/confirmation/:orderId" element={<OrderConfirmation />} />
             <Route path="/order/payment/:orderId" element={<Payment />} />
+            <Route path="/feedback" element={<FeedbackPage />} />
             <Route path="/login" element={<Login />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
