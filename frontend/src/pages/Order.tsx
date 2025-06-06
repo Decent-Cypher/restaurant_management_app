@@ -1,21 +1,7 @@
 import OrderLayout from "../components/OrderLayout";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-
-interface Menu {
-  id: number;
-  name: string;
-  description: string;
-  image: string;
-}
-
-interface MenuItem {
-  id: number;
-  name: string;
-  price: string;
-  image: string;
-  menu: number;
-}
+import { Menu, MenuItem } from "../types";
 
 export default function Order() {
   const [serviceType, setServiceType] = useState("");
@@ -120,9 +106,9 @@ export default function Order() {
           <h3 className="text-2xl font-bold mb-4 text-gray-800">Menu</h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
             {menus.map((menu) => (
-              <Link
+              <button
                 key={menu.id}
-                to={`/order/${menu.name.toLowerCase().replace(/ /g, "-")}`}
+                onClick={() => navigate("/order/menu", { state: { category: menu.name } })}
                 className="bg-white rounded-lg shadow hover:shadow-lg transition duration-200 p-3 text-center"
               >
                 <img
@@ -131,7 +117,7 @@ export default function Order() {
                   className="h-24 w-full object-cover mb-2 rounded"
                 />
                 <p className="text-sm font-semibold text-gray-700">{menu.name}</p>
-              </Link>
+              </button>
             ))}
           </div>
 
@@ -146,7 +132,7 @@ export default function Order() {
                 <img
                   src={item.image}
                   alt={item.name}
-                  className="h-32 w-full object-cover rounded mb-2"
+                  className="w-full aspect-square object-cover rounded mb-2"
                 />
                 <p className="font-semibold text-gray-700 mb-1">{item.name}</p>
                 <p className="text-sm text-gray-600 mb-2">{item.price} vnđ</p>
