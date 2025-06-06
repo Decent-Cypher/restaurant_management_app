@@ -115,28 +115,28 @@ export default function Menu() {
           description: "Warm apple pie with a flaky crust, served with a scoop of vanilla ice cream."
         },
         {
-          id: 9,
+          id: 13,
           name: "Chocolate Cake",
           price: "$7.99",
           image: "/dishes/chocolate-cake.jpg",
           description: "Rich chocolate cake with a molten center, served with vanilla ice cream."
         },
         {
-          id: 10,
+          id: 14,
           name: "Cheesecake",
           price: "$6.99",
           image: "/dishes/cheesecake.jpg",
           description: "Creamy New York style cheesecake with berry compote."
         },
         {
-          id: 11,
+          id: 15,
           name: "Tiramisu",
           price: "$8.99",
           image: "/dishes/tiramisu.jpg",
           description: "Coffee-flavored Italian dessert made of ladyfingers dipped in coffee, layered with mascarpone cheese."
         },
         {
-          id: 12,
+          id: 16,
           name: "Apple Pie",
           price: "$6.99",
           image: "/dishes/apple-pie.jpg",

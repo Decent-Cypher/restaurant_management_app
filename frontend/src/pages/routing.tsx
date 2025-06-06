@@ -10,21 +10,25 @@ import OrderMenu from './OrderMenu'
 import CartSummary from './CartSummary'
 import { CartProvider } from '../contexts/CartContext'; 
 
-
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <BrowserRouter>
-      <CartProvider>
-        <Routes>
-          <Route path="/" element={<App />} />
-          <Route path="/menu" element={<Menu />} />
-          <Route path="/order" element={<Order />} />
-          <Route path="/order/menu" element={<OrderMenu />} />
-          <Route path="/order/cart" element={<CartSummary />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </CartProvider>
-    </BrowserRouter>
-  </StrictMode>
-);
+const rootElement = document.getElementById('root');
+if (rootElement) {
+  createRoot(rootElement).render(
+    <StrictMode>
+      <BrowserRouter>
+        <CartProvider>
+          <Routes>
+            <Route path="/" element={<App />} />
+            <Route path="/menu" element={<Menu />} />
+            <Route path="/order" element={<Order />} />
+            <Route path="/order/menu" element={<OrderMenu />} />
+            <Route path="/order/cart" element={<CartSummary />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </CartProvider>
+      </BrowserRouter>
+    </StrictMode>,
+    );
+} else {
+  console.error('Root element not found');
+}
