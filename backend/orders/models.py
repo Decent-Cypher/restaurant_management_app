@@ -1,6 +1,7 @@
 from django.db import models
 from accounts.models import Diner
 from menu.models import MenuItem
+from django.utils import timezone
 
 # Create your models here.
 
@@ -13,9 +14,9 @@ class Order(models.Model):
     service_type = models.CharField(max_length=50)  # e.g. "Dine-In", "Takeout", etc.
     status = models.CharField(max_length=15, choices=STATUS_CHOICES, default='PENDING')
     note = models.CharField(max_length=200, blank=True)
-    total_price = models.DecimalField(max_digits=8, decimal_places=2, default=0.00)
+    total_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     diner = models.ForeignKey(Diner, on_delete=models.CASCADE)
-    time_created = models.DateTimeField(auto_now_add=True)
+    time_created = models.DateTimeField(default=timezone.now)
     last_modified = models.DateTimeField(auto_now=True)
 
     def __str__(self):
@@ -36,7 +37,7 @@ class Payment(models.Model):
     ]
     order = models.OneToOneField(Order, on_delete=models.CASCADE)
     method = models.CharField(max_length=20, choices=METHOD_CHOICES)
-    time_created = models.DateTimeField(auto_now_add=True)
+    time_created = models.DateTimeField(default=timezone.now)
     status = models.CharField(max_length=15, default='unpaid')
 
     def __str__(self):
