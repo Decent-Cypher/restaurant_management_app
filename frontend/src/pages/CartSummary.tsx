@@ -167,7 +167,7 @@ export default function CartSummary() {
                   </div>
                 )}
                 <div className="flex justify-between pt-1">
-                  <span>Tax 8%:</span>
+                  <span>Tax 0%:</span>
                   <span>{calculateTax().toLocaleString()} VND</span>
                 </div>
                 <hr className="my-2" />
@@ -190,7 +190,7 @@ export default function CartSummary() {
               </div>
               {editingServiceType ? (
                 <select
-                  value={serviceType}
+                  value={serviceType || ""}
                   onChange={(e) => {
                     const type = e.target.value as ServiceType;
                     setServiceType(type);

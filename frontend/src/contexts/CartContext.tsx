@@ -8,6 +8,7 @@ interface CartContextType {
   serviceType: ServiceType;
   tableNumber: string | null;
   address: string | null;
+  setCartItems: (items: CartItem[]) => void;
   setServiceType: (type: ServiceType) => void;
   setTableNumber: (number: string) => void;
   setAddress: (address: string) => void;
@@ -19,6 +20,7 @@ interface CartContextType {
   calculateSubTotal: () => number;
   calculateTax: () => number;
   getTotalQuantity: () => number;
+  getItemPrice: (price: string, quantity: number) => number;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -26,7 +28,7 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [allMenuItems, setAllMenuItems] = useState<MenuItem[]>([]);
-  const [serviceType, setServiceType] = useState<ServiceType>(null);
+  const [serviceType, setServiceType] = useState<ServiceType>("Dine-in");
   const [tableNumber, setTableNumber] = useState<string | null>(null);
   const [address, setAddress] = useState<string | null>(null);
 
@@ -87,7 +89,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
   const calculateTax = () => {
     const total = calculateSubTotal();
-    const taxRate = 0.08; // Example tax rate of 10%
+    const taxRate = 0.00; 
     return total * taxRate;
   }
 
@@ -98,8 +100,12 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     return subTotal + tax + deliveryFee;
   }
 
+  const getItemPrice = (price: string, quantity: number) => {
+    return Number(price) * quantity;
+  }
+
   return (
-    <CartContext.Provider value={{ cartItems, serviceType, setServiceType, tableNumber, setTableNumber, address, setAddress, addToCart, removeFromCart, clearCart, calculateSubTotal, decreaseQuantity, calculateTax, calculateTotal, getTotalQuantity}}>
+    <CartContext.Provider value={{ cartItems, serviceType, setServiceType, tableNumber, setTableNumber, address, setAddress, addToCart, removeFromCart, clearCart, calculateSubTotal, decreaseQuantity, calculateTax, calculateTotal, getTotalQuantity, getItemPrice, setCartItems}}>
       {children}
     </CartContext.Provider>
   );

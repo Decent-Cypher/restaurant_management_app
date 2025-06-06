@@ -20,3 +20,15 @@ export interface CartItem {
   quantity: number;
   image: string;
 }
+
+export interface Order {
+  id: number;
+  service_type: string;
+  diner_id: number;
+  total_price: number;
+  created_at: string;
+  last_modified: string;
+  address: string | null;
+  note: string | null;
+  items: CartItem[];
+}

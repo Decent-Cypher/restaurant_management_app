@@ -7,7 +7,8 @@ interface CartItemProps {
 }
 
 export default function CartItemLayout({item}: CartItemProps) {
-  const {addToCart, removeFromCart, decreaseQuantity} = useCart();
+  const {addToCart, removeFromCart, decreaseQuantity, getItemPrice} = useCart();
+  const itemPrice = getItemPrice(item.price, item.quantity);
 
   return (
     <div className="bg-white rounded-xl p-4 mb-4 shadow-sm relative">
@@ -37,7 +38,7 @@ export default function CartItemLayout({item}: CartItemProps) {
             <Plus size={12} />
           </button>
         </div>
-        <p className="font-semibold text-sm text-gray-700">{Number(item.price).toLocaleString()} VND</p>
+        <p className="font-semibold text-sm text-gray-700">{itemPrice.toLocaleString()} VND</p>
       </div>
     </div>
   );
