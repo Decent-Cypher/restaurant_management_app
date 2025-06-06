@@ -1,8 +1,16 @@
-import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { CartItem, MenuItem } from '../types'; // adjust the path as needed
+
+export type ServiceType = "Dine-in" | "Delivery" | "Take-away" | null;
 
 interface CartContextType {
   cartItems: CartItem[];
+  serviceType: ServiceType;
+  tableNumber: string | null;
+  address: string | null;
+  setServiceType: (type: ServiceType) => void;
+  setTableNumber: (number: string) => void;
+  setAddress: (address: string) => void;
   addToCart: (id: number) => void;
   removeFromCart: (id: number) => void;
   clearCart: () => void;
@@ -18,9 +26,13 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [allMenuItems, setAllMenuItems] = useState<MenuItem[]>([]);
+  const [serviceType, setServiceType] = useState<ServiceType>(null);
+  const [tableNumber, setTableNumber] = useState<string | null>(null);
+  const [address, setAddress] = useState<string | null>(null);
+
 
   useEffect(() => {
-    fetch("http://localhost:8000/api/menuitems/")
+    fetch("http://localhost:8000/api/menu/menu-items/")
       .then((res) => res.json())
       .then((data) => setAllMenuItems(data))
       .catch((error) => console.error("Failed to fetch menu items:", error));
@@ -87,7 +99,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   }
 
   return (
-    <CartContext.Provider value={{ cartItems, addToCart, removeFromCart, clearCart, calculateSubTotal, decreaseQuantity, calculateTax, calculateTotal, getTotalQuantity}}>
+    <CartContext.Provider value={{ cartItems, serviceType, setServiceType, tableNumber, setTableNumber, address, setAddress, addToCart, removeFromCart, clearCart, calculateSubTotal, decreaseQuantity, calculateTax, calculateTotal, getTotalQuantity}}>
       {children}
     </CartContext.Provider>
   );
