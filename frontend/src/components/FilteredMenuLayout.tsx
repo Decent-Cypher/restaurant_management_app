@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { Menu, MenuItem } from "../types";
-import { useCart } from '../contexts/CartContext';
+import MenuItemLayout from "./MenuItemLayout";
 
 interface FilteredMenuProps {
   categories: Menu[];
@@ -9,7 +9,6 @@ interface FilteredMenuProps {
 
 export default function FilteredMenuLayout({categories, items }: FilteredMenuProps) {
   const navigate = useNavigate();
-  const { addToCart } = useCart();
 
   return (
     <div>
@@ -31,23 +30,10 @@ export default function FilteredMenuLayout({categories, items }: FilteredMenuPro
       {/* Menu items */}
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-6">
         {items.map((item) => (
-          <div
+          <MenuItemLayout
             key={item.id}
-            className="bg-white rounded-lg shadow p-4 flex flex-col items-center text-center"
-          >
-            <img
-              src={item.image}
-              alt={item.name}
-              className="w-full aspect-square object-cover rounded mb-2"
-            />
-            <p className="font-semibold text-gray-700 mb-1">{item.name}</p>
-            <p className="text-sm text-gray-600 mb-2">{Number(item.price).toLocaleString()} VND</p>
-            <button 
-            onClick={() => addToCart(item.id)}
-            className="bg-white border border-gray-400 rounded-full w-8 h-8 flex items-center justify-center text-xl text-gray-800 shadow">
-              +
-            </button>
-          </div>
+            item={item}
+          />
         ))}
       </div>
     </div>

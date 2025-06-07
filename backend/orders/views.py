@@ -140,6 +140,7 @@ def submit_order(request: HttpResponse) -> JsonResponse:
         # address = request.POST.get("address", "")  # Optional, for delivery orders
         ordered_items = request.POST.getlist("ordered_items")  # expecting list of item IDs
         quantities = request.POST.getlist("quantities")         # matching list of quantities
+        assert len(ordered_items) == len(quantities) and len(ordered_items) > 0, "Items and quantities mismatch or empty"
         
         try:
             diner = Diner.objects.get(id=diner_id)

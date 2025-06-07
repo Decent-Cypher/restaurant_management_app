@@ -1,19 +1,39 @@
 import OrderLayout from "../components/OrderLayout";
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Menu, MenuItem } from "../types";
+import MenuItemLayout from "../components/MenuItemLayout";
+import { useCart } from '../contexts/CartContext';
+import type { ServiceType } from '../contexts/CartContext';
 
 export default function Order() {
-  const [serviceType, setServiceType] = useState("");
-  const [tableNumber, setTableNumber] = useState("");
+  const {
+    serviceType,
+    setServiceType,
+    tableNumber,
+    setTableNumber,
+    address,
+    setAddress
+  } = useCart();
   const [tableError, setTableError] = useState("");
   const [feedback, setFeedback] = useState<string | null>(null);
   const [menus, setMenus] = useState<Menu[]>([]);
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [showFollowUp, setShowFollowUp] = useState(false);
+  const [addressError, setAddressError] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  const handleTableNumberChange = (e: any) => {
+  const handleServiceTypeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const type = e.target.value as ServiceType;
+    setServiceType(type);
+    if (type === "Dine-in") {
+      setAddress(null);
+    } else if (type === "Delivery") {
+      setTableNumber(null);
+    }
+  };
+
+  const handleTableNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setTableNumber(value);
     if (!/^([1-9]|1\d|20)$/.test(value)) {
@@ -21,6 +41,18 @@ export default function Order() {
     } else {
       setTableError("");
     }
+  };
+
+  const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+
+    if (value.trim() === "") {
+      setAddressError("Please enter your delivery address");
+    } else {
+      setAddressError(null);
+    }
+
+    setAddress(value);
   };
 
   useEffect(() => {
@@ -68,7 +100,7 @@ export default function Order() {
                     name="serviceType"
                     value={type}
                     checked={serviceType === type}
-                    onChange={() => setServiceType(type)}
+                    onChange={handleServiceTypeChange}
                   />
                   {type}
                 </label>
@@ -94,7 +126,10 @@ export default function Order() {
                   type="text"
                   placeholder="Enter your delivery destination"
                   className="rounded-full  placeholder:font-medium placeholder:text-sm placeholder-gray-300 text-gray-700 px-4 py-2 w-full border"
+                  value={address}
+                  onChange={handleAddressChange}
                 />
+                {addressError && <p className="text-red-500 text-sm mt-1 ml-4">{addressError}</p>}
               </div>
             )}
 
@@ -124,67 +159,9 @@ export default function Order() {
           {/* Popular Dishes */}
           <h3 className="text-2xl font-bold mb-4 text-gray-800">Popular Dishes</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
-            {menuItems.slice(0, 5).map((item) => (
-              <div
-                key={item.id}
-                className="bg-white rounded-lg shadow p-4 flex flex-col items-center text-center"
-              >
-                <img
-                  src={item.image}
-                  alt={item.name}
-                  className="w-full aspect-square object-cover rounded mb-2"
-                />
-                <p className="font-semibold text-gray-700 mb-1">{item.name}</p>
-                <p className="text-sm text-gray-600 mb-2">{item.price} vnđ</p>
-                <button className="bg-white border border-gray-400 rounded-full w-8 h-8 flex items-center justify-center text-xl text-gray-800 shadow">
-                  +
-                </button>
-              </div>
+            {menuItems.slice(0, 5).map((item) => (<MenuItemLayout item={item} key={item.id} />
             ))}
           </div>
-
-          {/* Feedback Section */}
-          <div className="bg-white p-6 rounded-2xl shadow-md max-w-2xl mx-auto mt-8">
-            {!feedback ? (
-              <>
-                <h4 className="font-medium text-sm text-center text-gray-800 mb-4">How was your experience with our service?</h4>
-                <div className="flex justify-around">
-                  {["😠", "🙁", "😐", "🙂", "😄"].map((face, idx) => (
-                    <button
-                      key={idx}
-                      className="text-4xl hover:scale-110 transition"
-                      onClick={() => setFeedback(face)}
-                    >
-                      {face}
-                    </button>
-                  ))}
-                </div>
-              </>
-            ) : (
-              <>
-                <h4 className="font-medium text-sm text-gray-800 text-center mb-4">
-                  {feedback === "😄" || feedback === "🙂"
-                    ? "Great! Can you share your throughts with us?"
-                    : "We're sorry. Can you tell us what's wrong?"}
-                </h4>
-                <div className="flex justify-center gap-4">
-                  <button
-                    className="bg-white px-6 py-2 rounded-full shadow text-gray-700"
-                    onClick={() => setFeedback(null)}
-                  >
-                    No, thank you!
-                  </button>
-                  <button
-                    className="bg-[#1e2a59] text-white px-6 py-2 rounded-full shadow"
-                    onClick={() => navigate("/feedback")}
-                  >
-                    Yes, of course!
-                  </button>
-                </div>
-              </>
-            )}
-          </div>
-
         </div>
       </div>
     </OrderLayout>

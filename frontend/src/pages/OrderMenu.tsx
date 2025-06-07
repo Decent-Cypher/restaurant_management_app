@@ -18,11 +18,11 @@ export default function OrderMenu() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const menusRes = await fetch("http://localhost:8000/api/menus/");
+        const menusRes = await fetch("http://localhost:8000/api/menu/menus/");
         const menusData: Menu[] = await menusRes.json();
         setMenus(menusData);
 
-        const itemsRes = await fetch("http://localhost:8000/api/menuitems/");
+        const itemsRes = await fetch("http://localhost:8000/api/menu/menu-items/");
         const itemsData: MenuItem[] = await itemsRes.json();
         setAllMenuItems(itemsData);
 
