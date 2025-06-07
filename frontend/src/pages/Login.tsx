@@ -15,30 +15,37 @@ export default function Login() {
     setError(null);
     
     try {
-      const response = await fetch("http://localhost:8000/api/accounts/login/", {
+      // Determine the correct endpoint based on user type
+      const endpoint = userType === "customer" 
+        ? "http://localhost:8000/api/accounts/diner/login/"
+        : "http://localhost:8000/api/accounts/staff/login/";
+      
+      const response = await fetch(endpoint, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+        headers: { 
+          "Content-Type": "application/x-www-form-urlencoded" 
         },
         credentials: "include",
-        body: JSON.stringify({
-          username,
-          password,
-          userType
-        }),
+        body: new URLSearchParams({ 
+          username, 
+          password 
+        })
       });
       
       const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.error || "Login failed");
+      
+      if (data.success) {
+        console.log("Login successful:", data);
+        // Handle successful login - redirect or update state as needed
+        // You might want to store user info in context/state management
+        // window.location.href = "/dashboard"; // Example redirect
+      } else {
+        setError(data.error || "Login failed");
       }
       
-      // Handle successful login
-      console.log("Login successful:", data);
-      // Redirect or update state as needed
-      
     } catch (err: any) {
-      setError(err.message || "Something went wrong");
+      console.error(err);
+      setError("Request failed - please try again");
     } finally {
       setIsLoading(false);
     }
@@ -50,29 +57,32 @@ export default function Login() {
     setError(null);
     
     try {
-      const response = await fetch("http://localhost:8000/api/accounts/signup/", {
+      // Only customers can sign up
+      const response = await fetch("http://localhost:8000/api/accounts/diner/signup/", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+        headers: { 
+          "Content-Type": "application/x-www-form-urlencoded" 
         },
-        body: JSON.stringify({
-          username,
-          password,
-          userType: "customer"
-        }),
+        credentials: "include",
+        body: new URLSearchParams({ 
+          username, 
+          password 
+        })
       });
       
       const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.error || "Signup failed");
+      
+      if (data.success) {
+        console.log("Signup successful:", data);
+        // Handle successful signup
+        // You might want to automatically log them in or show a success message
+      } else {
+        setError(data.error || "Signup failed");
       }
       
-      // Handle successful signup
-      console.log("Signup successful:", data);
-      // Redirect or update state as needed
-      
     } catch (err: any) {
-      setError(err.message || "Something went wrong");
+      console.error(err);
+      setError("Request failed - please try again");
     } finally {
       setIsLoading(false);
     }
@@ -123,7 +133,7 @@ export default function Login() {
             <form onSubmit={handleLogin}>
               <div className="mb-4">
                 <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-2">
-                  Email or Username
+                  Username
                 </label>
                 <input
                   type="text"
@@ -132,7 +142,7 @@ export default function Login() {
                   onChange={(e) => setUsername(e.target.value)}
                   required
                   className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
-                  placeholder="Enter your email or username"
+                  placeholder="Enter your username"
                 />
               </div>
               
@@ -162,10 +172,8 @@ export default function Login() {
                   />
                   <div className="absolute inset-0 bg-gray-100 border border-gray-300 rounded cursor-pointer">
                     {showPassword && (
-                      <div className="absolute inset-0 flex items-center justify-center text-gray-700">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                        </svg>
+                      <div className="absolute inset-0 flex items-center justify-center text-blue-600">
+                        <div className="h-2 w-2 bg-blue-600 rounded-sm"></div>
                       </div>
                     )}
                   </div>
