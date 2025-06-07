@@ -162,49 +162,6 @@ export default function Order() {
             {menuItems.slice(0, 5).map((item) => (<MenuItemLayout item={item} key={item.id} />
             ))}
           </div>
-
-          {/* Feedback Section */}
-          <div className="bg-white p-6 rounded-2xl shadow-md max-w-2xl mx-auto mt-8">
-            {!feedback ? (
-              <>
-                <h4 className="font-medium text-sm text-center text-gray-800 mb-4">How was your experience with our service?</h4>
-                <div className="flex justify-around">
-                  {["😠", "🙁", "😐", "🙂", "😄"].map((face, idx) => (
-                    <button
-                      key={idx}
-                      className="text-4xl hover:scale-110 transition"
-                      onClick={() => setFeedback(face)}
-                    >
-                      {face}
-                    </button>
-                  ))}
-                </div>
-              </>
-            ) : (
-              <>
-                <h4 className="font-medium text-sm text-gray-800 text-center mb-4">
-                  {feedback === "😄" || feedback === "🙂"
-                    ? "Great! Can you share your throughts with us?"
-                    : "We're sorry. Can you tell us what's wrong?"}
-                </h4>
-                <div className="flex justify-center gap-4">
-                  <button
-                    className="bg-white px-6 py-2 rounded-full shadow text-gray-700"
-                    onClick={() => setFeedback(null)}
-                  >
-                    No, thank you!
-                  </button>
-                  <button
-                    className="bg-[#1e2a59] text-white px-6 py-2 rounded-full shadow"
-                    onClick={() => navigate("/feedback")}
-                  >
-                    Yes, of course!
-                  </button>
-                </div>
-              </>
-            )}
-          </div>
-
         </div>
       </div>
     </OrderLayout>
