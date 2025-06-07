@@ -66,8 +66,8 @@ urlpatterns = [
     path('api/reviews/', include(review_router.urls)),
 
     # Analytics URLs
-    path('api/analytics/rating/', analytics_views.get_mean_rating, name='get_mean_rating'),
-    path('api/analytics/revenue/', analytics_views.get_total_revenue, name='get_total_revenue'),
+    path('api/analytics/rating/', analytics_views.get_rating_analytics, name='get_rating_analytics'),
+    path('api/analytics/revenue/', analytics_views.get_revenue_analytics, name='get_revenue_analytics'),
     path('api/analytics/order-count/', analytics_views.get_menu_items_order_count, name='get_order_count'),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

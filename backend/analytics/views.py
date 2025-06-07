@@ -4,10 +4,12 @@ from datetime import datetime
 from django.db.models import Sum
 from reviews.models import Feedback  # Assumes the Feedback model is in the reviews app
 from orders.models import Order, OrderItem
+from collections import Counter
+from django.db.models.functions import TruncMonth
 
 
 @csrf_exempt
-def get_mean_rating(request: HttpRequest) -> JsonResponse:
+def get_rating_analytics(request: HttpRequest) -> JsonResponse:
     """
     Returns the mean rating for feedbacks within a given time range.
     Expects 'start' and 'end' query parameters in the format 'YYYY-MM-DD HH:MM:SS'.
@@ -41,11 +43,14 @@ def get_mean_rating(request: HttpRequest) -> JsonResponse:
     else:
         mean_rating = sum(ratings) / len(ratings)
     
-    return JsonResponse({"status": "success", "mean_rating": mean_rating})
+    rating_counts = dict(Counter(ratings))
+
+
+    return JsonResponse({"status": "success", "mean_rating": mean_rating, "rating_counts": rating_counts})
 
 
 @csrf_exempt
-def get_total_revenue(request: HttpRequest) -> JsonResponse:
+def get_revenue_analytics(request: HttpRequest) -> JsonResponse:
     """
     Returns the total revenue (sum of order total prices) within a given time range.
     Expects 'start' and 'end' query parameters in the format 'YYYY-MM-DD HH:MM:SS'.
@@ -71,10 +76,22 @@ def get_total_revenue(request: HttpRequest) -> JsonResponse:
             "message": "Invalid datetime format, use YYYY-MM-DD HH:MM:SS"
         }, status=400)
     
-    orders = Order.objects.filter(time_created__range=(start_dt, end_dt))
-    revenue = orders.aggregate(total_revenue=Sum('total_price'))["total_revenue"] or 0
+    orders = Order.objects.filter(last_modified__range=(start_dt, end_dt))
+    # Group orders by month and sum total_price for each month
+
+    monthly_revenue = (
+        orders.annotate(month=TruncMonth('time_created'))
+        .values('month')
+        .annotate(total_revenue=Sum('total_price'))
+        .order_by('month')
+    )
+    monthly_revenue_list = [
+        {"month": m["month"].strftime("%Y-%m"), "total_revenue": m["total_revenue"] or 0}
+        for m in monthly_revenue
+    ]
+    total_revenue = orders.aggregate(total_revenue=Sum('total_price'))["total_revenue"] or 0
     
-    return JsonResponse({"status": "success", "total_revenue": revenue})
+    return JsonResponse({"status": "success", "total_revenue": total_revenue, "monthly_revenue": monthly_revenue_list})
 
 
 @csrf_exempt
