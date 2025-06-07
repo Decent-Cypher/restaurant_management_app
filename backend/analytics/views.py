@@ -106,7 +106,7 @@ def get_menu_items_order_count(request: HttpRequest) -> JsonResponse:
         }, status=400)
     
     order_items = OrderItem.objects.filter(order__last_modified__range=(start_dt, end_dt))
-    counts = order_items.values("menu_item__name").annotate(order_count=Sum("quantity"))
+    counts = order_items.values("menu_item__id").annotate(order_count=Sum("quantity"))
     result = list(counts)
     
     return JsonResponse({"status": "success", "menu_items_order_count": result})
