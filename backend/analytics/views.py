@@ -1,53 +1,103 @@
 from django.http import JsonResponse, HttpRequest
 from django.views.decorators.csrf import csrf_exempt
-from .models import Feedback  # Ensure this is the correct import path
+from datetime import datetime
+from django.db.models import Sum
+from reviews.models import Feedback  # Assumes the Feedback model is in the reviews app
+from orders.models import Order, OrderItem
 
-@csrf_exempt  # Remove or modify for production
-def list_feedback(request: HttpRequest) -> JsonResponse:
+@csrf_exempt
+def get_mean_rating(request: HttpRequest) -> JsonResponse:
     """
-    List all feedback data. Only available for logged-in staff.
+    Returns the mean rating for feedbacks within a given time range.
+    Expects 'start' and 'end' query parameters in the format 'YYYY-MM-DD HH:MM:SS'.
     """
     if request.method != "GET":
-        return JsonResponse({"status": "error", "message": "Invalid request method"}, status=405)
+        return JsonResponse({"status": "error", "message": "Invalid HTTP method"}, status=405)
     
-    if "staff_id" not in request.session:
-        return JsonResponse({"status": "error", "message": "Not authorized"}, status=403)
+    start = request.GET.get("start")
+    end = request.GET.get("end")
     
-    feedback_qs = Feedback.objects.all()
-    feedback_list = []
-    for fb in feedback_qs:
-        feedback_list.append({
-            "id": fb.id,
-            "order_id": fb.order.id if fb.order else None,
-            "rating": fb.rating,
-            "comment": fb.comment,
-            "created": fb.created.strftime("%Y-%m-%d %H:%M:%S")
-        })
-    
-    return JsonResponse({"status": "success", "feedback": feedback_list})
-
-
-@csrf_exempt  # Remove or modify for production
-def get_feedback_detail(request: HttpRequest, feedback_id: int) -> JsonResponse:
-    """
-    Get detailed feedback data for a specific feedback entry.
-    """
-    if request.method != "GET":
-        return JsonResponse({"status": "error", "message": "Invalid request method"}, status=405)
-    
-    if "staff_id" not in request.session:
-        return JsonResponse({"status": "error", "message": "Not authorized"}, status=403)
+    if not start or not end:
+        return JsonResponse({"status": "error", "message": "start and end parameters are required"}, status=400)
     
     try:
-        fb = Feedback.objects.get(id=feedback_id)
-    except Feedback.DoesNotExist:
-        return JsonResponse({"status": "error", "message": "Feedback not found"}, status=404)
+        start_dt = datetime.strptime(start, "%Y-%m-%d %H:%M:%S")
+        end_dt = datetime.strptime(end, "%Y-%m-%d %H:%M:%S")
+    except ValueError:
+        return JsonResponse({
+            "status": "error",
+            "message": "Invalid datetime format, use YYYY-MM-DD HH:MM:SS"
+        }, status=400)
     
-    data = {
-        "id": fb.id,
-        "order_id": fb.order.id if fb.order else None,
-        "rating": fb.rating,
-        "comment": fb.comment,
-        "created": fb.created.strftime("%Y-%m-%d %H:%M:%S")
-    }
-    return JsonResponse({"status": "success", "feedback": data})
+    feedbacks = Feedback.objects.filter(created__range=(start_dt, end_dt)).values_list('rating', flat=True)
+    ratings = list(feedbacks)
+    
+    if not ratings:
+        mean_rating = 0
+    else:
+        mean_rating = sum(ratings) / len(ratings)
+    
+    return JsonResponse({"status": "success", "mean_rating": mean_rating})
+
+
+@csrf_exempt
+def get_total_revenue(request: HttpRequest) -> JsonResponse:
+    """
+    Returns the total revenue (sum of order total prices) within a given time range.
+    Expects 'start' and 'end' query parameters in the format 'YYYY-MM-DD HH:MM:SS'.
+    """
+    if request.method != "GET":
+        return JsonResponse({"status": "error", "message": "Invalid HTTP method"}, status=405)
+    
+    start = request.GET.get("start")
+    end = request.GET.get("end")
+    
+    if not start or not end:
+        return JsonResponse({"status": "error", "message": "start and end parameters are required"}, status=400)
+    
+    try:
+        start_dt = datetime.strptime(start, "%Y-%m-%d %H:%M:%S")
+        end_dt = datetime.strptime(end, "%Y-%m-%d %H:%M:%S")
+    except ValueError:
+        return JsonResponse({
+            "status": "error",
+            "message": "Invalid datetime format, use YYYY-MM-DD HH:MM:SS"
+        }, status=400)
+    
+    orders = Order.objects.filter(time_created__range=(start_dt, end_dt))
+    revenue = orders.aggregate(total_revenue=Sum('total_price'))["total_revenue"] or 0
+    
+    return JsonResponse({"status": "success", "total_revenue": revenue})
+
+
+@csrf_exempt
+def get_menu_items_order_count(request: HttpRequest) -> JsonResponse:
+    """
+    Returns the count of ordered menu items within a given time range.
+    Expects 'start' and 'end' query parameters in the format 'YYYY-MM-DD HH:MM:SS'.
+    Returns a list of menu item names and their total order quantities.
+    """
+    if request.method != "GET":
+        return JsonResponse({"status": "error", "message": "Invalid HTTP method"}, status=405)
+    
+    start = request.GET.get("start")
+    end = request.GET.get("end")
+    
+    if not start or not end:
+        return JsonResponse({"status": "error", "message": "start and end parameters are required"}, status=400)
+    
+    try:
+        start_dt = datetime.strptime(start, "%Y-%m-%d %H:%M:%S")
+        end_dt = datetime.strptime(end, "%Y-%m-%d %H:%M:%S")
+    except ValueError:
+        return JsonResponse({
+            "status": "error",
+            "message": "Invalid datetime format, use YYYY-MM-DD HH:MM:SS"
+        }, status=400)
+    
+    order_items = OrderItem.objects.filter(order__time_created__range=(start_dt, end_dt))
+    counts = order_items.values("menu_item__name").annotate(order_count=Sum("quantity"))
+    result = list(counts)
+    
+    return JsonResponse({"status": "success", "menu_items_order_count": result})
+
