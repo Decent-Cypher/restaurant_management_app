@@ -5,6 +5,7 @@ from django.db.models import Sum
 from reviews.models import Feedback  # Assumes the Feedback model is in the reviews app
 from orders.models import Order, OrderItem
 
+
 @csrf_exempt
 def get_mean_rating(request: HttpRequest) -> JsonResponse:
     """
@@ -14,6 +15,9 @@ def get_mean_rating(request: HttpRequest) -> JsonResponse:
     if request.method != "GET":
         return JsonResponse({"status": "error", "message": "Invalid HTTP method"}, status=405)
     
+    if "staff_id" not in request.session:
+        return JsonResponse({"status": "error", "message": "Unauthorized access"}, status=403)
+
     start = request.GET.get("start")
     end = request.GET.get("end")
     
@@ -29,7 +33,7 @@ def get_mean_rating(request: HttpRequest) -> JsonResponse:
             "message": "Invalid datetime format, use YYYY-MM-DD HH:MM:SS"
         }, status=400)
     
-    feedbacks = Feedback.objects.filter(created__range=(start_dt, end_dt)).values_list('rating', flat=True)
+    feedbacks = Feedback.objects.filter(time_created__range=(start_dt, end_dt)).values_list('rating', flat=True)
     ratings = list(feedbacks)
     
     if not ratings:
@@ -49,6 +53,9 @@ def get_total_revenue(request: HttpRequest) -> JsonResponse:
     if request.method != "GET":
         return JsonResponse({"status": "error", "message": "Invalid HTTP method"}, status=405)
     
+    if "staff_id" not in request.session:
+        return JsonResponse({"status": "error", "message": "Unauthorized access"}, status=403)
+
     start = request.GET.get("start")
     end = request.GET.get("end")
     
@@ -80,6 +87,9 @@ def get_menu_items_order_count(request: HttpRequest) -> JsonResponse:
     if request.method != "GET":
         return JsonResponse({"status": "error", "message": "Invalid HTTP method"}, status=405)
     
+    if "staff_id" not in request.session:
+        return JsonResponse({"status": "error", "message": "Unauthorized access"}, status=403)
+
     start = request.GET.get("start")
     end = request.GET.get("end")
     
@@ -95,7 +105,7 @@ def get_menu_items_order_count(request: HttpRequest) -> JsonResponse:
             "message": "Invalid datetime format, use YYYY-MM-DD HH:MM:SS"
         }, status=400)
     
-    order_items = OrderItem.objects.filter(order__time_created__range=(start_dt, end_dt))
+    order_items = OrderItem.objects.filter(order__last_modified__range=(start_dt, end_dt))
     counts = order_items.values("menu_item__name").annotate(order_count=Sum("quantity"))
     result = list(counts)
     
