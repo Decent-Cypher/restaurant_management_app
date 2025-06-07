@@ -61,11 +61,12 @@ def protected_view(request: HttpRequest) -> JsonResponse:
     """
     Example view that requires a staff or diner to be logged in.
     """
-    print('hello')
     print(request.session)
     if 'staff_id' in request.session:
-        return JsonResponse({'success': True, 'message': 'Hello Staff Bro'})
+        staff = Staff.objects.get(id=request.session['staff_id'])
+        # Check if staff has manager role by querying the database
+        return JsonResponse({'success': True, 'message': 'Hello Staff Bro', 'staff_id': request.session['staff_id'], 'role': staff.role})
     elif 'diner_id' in request.session:
-        return JsonResponse({'success': True, 'message': 'Hello Diner Bro'})
+        return JsonResponse({'success': True, 'message': 'Hello Diner Bro', 'diner_id': request.session['diner_id']})
     return JsonResponse({'success': False, 'error': 'Not logged in'}, status=403)
 
