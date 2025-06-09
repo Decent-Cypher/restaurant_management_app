@@ -4,6 +4,8 @@ import { useState } from "react";
 import { logout } from "../api/auth";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import OrderManagementTable from "../components/OrderManagementTable";
+import AnalyticsDashboard from "../components/AnalyticsDashboard";
 
 const SidebarItem = ({
   icon: Icon,
@@ -142,6 +144,20 @@ export default function Settings() {
                 </tbody>
               </table>
             </div>
+          </div>
+        );
+      
+      case "Order Management":
+        return (
+          <div>
+            <OrderManagementTable />
+          </div>
+        );
+      
+      case "Analytics":
+        return (
+          <div>
+            <AnalyticsDashboard />
           </div>
         );
 
