@@ -9,7 +9,7 @@ const ProtectedRoute = ({ children }) => {
   if (user === null) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
-
+  // alert(`user: ${user.role}`);
   return children;
 };
 

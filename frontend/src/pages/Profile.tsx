@@ -32,12 +32,16 @@ const SidebarItem = ({
 export default function Profile() {
   const [activePanel, setActivePanel] = useState("Personal Information");
   const navigate = useNavigate();
-  const { fetchUser } = useAuth();
-  const [dinerInfo, setDinerInfo] = useState<Diner | null>(null);
-
+  const { user, fetchUser } = useAuth();
+  const [dinerInfo, setDinerInfo] = useState<Diner>({
+    name: "",
+    email: "",
+    phone_number: "",
+  });
 
   useEffect(() => {
     const fetchDinerInfo = async () => {
+      alert("Fetching diner info...");
       try {
         const response = await fetch("http://localhost:8000/api/accounts/diner/info/", {
           method: "GET",
@@ -61,10 +65,12 @@ export default function Profile() {
         console.error("Error fetching diner info:", error);
       }
     };
-
-    fetchDinerInfo();
-  }, []); 
-
+    
+    if (user) {
+      fetchDinerInfo();
+    }
+  }, [user]); 
+  
   const handleLogout = async () => {
     try {
       const data = await logout();

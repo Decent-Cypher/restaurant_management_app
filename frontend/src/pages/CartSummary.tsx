@@ -5,6 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import OrderLayout from '../components/OrderLayout';
 import CartItemLayout from '../components/CartItemLayout';
 import { CartItem } from '../types';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function CartSummary() {
   const {
