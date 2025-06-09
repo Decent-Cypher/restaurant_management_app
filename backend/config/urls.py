@@ -56,6 +56,7 @@ urlpatterns = [
 
     # Orders URLs
     path('api/orders/get_order/', order_views.get_order_by_id, name='get_order_by_id'),
+    path('api/orders/get_bill/', order_views.get_bill, name='get_bill'),
     path('api/orders/items/add/', order_views.add_order_item, name='add_order_item'),
     path('api/orders/items/remove/', order_views.remove_order_item, name='remove_order_item'),
     path('api/orders/note/add/', order_views.add_note, name='add_note'),

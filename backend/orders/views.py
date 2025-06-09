@@ -8,7 +8,7 @@ from menu.models import MenuItem
 from accounts.models import Diner
 import json
 
-
+@csrf_exempt
 def get_order_by_id(request: HttpResponse) -> JsonResponse:
     """
     Get specific order by ID.
@@ -30,6 +30,23 @@ def get_order_by_id(request: HttpResponse) -> JsonResponse:
                              "last_modified": order.last_modified.strftime('%Y-%m-%d %H:%M:%S')}, 
                              status=200)
     return JsonResponse({"status": "error", "message": "Invalid request method"}, status=405)
+
+@csrf_exempt
+def get_bill(request: HttpResponse) -> JsonResponse:
+    """
+    Get the bill for a specific order.
+    """
+    if request.method == "GET":
+        order_id = request.GET.get("order_id")
+        try:
+            order = Order.objects.get(id=order_id)
+        except Order.DoesNotExist:
+            return JsonResponse({"status": "error", "message": "Order not found"}, status=404)
+
+        order_items = list(OrderItem.objects.filter(order_id=order_id).values('menu_item__name', 'quantity', 'menu_item__price'))
+        return JsonResponse({"status": "success", "order_id": order.id, "items": order_items})
+    return JsonResponse({"status": "error", "message": "Invalid request method"}, status=405)
+        
 
 @csrf_exempt
 def add_order_item(request: HttpResponse) -> JsonResponse:
@@ -153,9 +170,16 @@ def submit_order(request: HttpResponse) -> JsonResponse:
     """
     Submit the order for processing
     """
+<<<<<<< HEAD
     # # Protect view
     # if "diner_id" not in request.session:
     #     return JsonResponse({"status": "error", "message": "Not authorized"}, status=403)
+=======
+    # Protect view
+    # print(request.session)
+    if "diner_id" not in request.session:
+        return JsonResponse({"status": "error", "message": "Not authorized"}, status=403)
+>>>>>>> origin/master
         
     if request.method == "POST":
         request_body = json.loads(request.body)
