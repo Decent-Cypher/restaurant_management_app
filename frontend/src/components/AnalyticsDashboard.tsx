@@ -177,12 +177,12 @@ export default function AnalyticsDashboard({ className = "" }: AnalyticsDashboar
   };
 
   return (
-    <div className={`bg-white rounded-2xl shadow-lg overflow-hidden ${className}`}>
+    <div className={`bg-white overflow-hidden ${className}`}>
       {/* Header */}
-      <div className="px-6 py-4 border-b border-gray-200">
+      <div className="border-b border-gray-200">
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Analytics Dashboard</h1>
+            <h1 className="text-2xl font-semibold text-gray-900">Analytics Dashboard</h1>
             <p className="text-gray-600 mt-1">View restaurant performance metrics and insights</p>
           </div>
           
