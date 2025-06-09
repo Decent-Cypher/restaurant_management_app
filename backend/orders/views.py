@@ -43,26 +43,31 @@ def get_bill(request: HttpResponse) -> JsonResponse:
         except Order.DoesNotExist:
             return JsonResponse({"status": "error", "message": "Order not found"}, status=404)
 
-        order_items = list(OrderItem.objects.filter(order_id=order_id).values('menu_item__name', 'quantity', 'menu_item__price'))
+        order_items = list(
+            OrderItem.objects.filter(order_id=order_id)
+            .values('menu_item__id', 'menu_item__name', 'menu_item__price', 'menu_item__image', 'quantity')
+        )
         items_data = []
         for item in order_items:
-            menu_item = item["menu_item"]
             items_data.append({
-                "name": menu_item["menu_item__name"],
-                "menu_item_id": menu_item["menu_item__id"], 
-                "image" : menu_item["image"] if hasattr(menu_item, "image") else None,  # Optional image field
+                "name": item["menu_item__name"],
+                "menu_item_id": item["menu_item__id"],
+                "image": item.get("menu_item__image", None),
                 "quantity": item["quantity"],
-                "price": menu_item["menu_item__price"]
+                "price": item["menu_item__price"]
             })
-        return JsonResponse({"status": "success",                              
-                             "order_id": order.id,
-                             "service_type": order.service_type,
-                             "order_status": order.status,
-                             "total_price": order.total_price,
-                             "note": order.note,
-                             "time_created": order.time_created.strftime('%Y-%m-%d %H:%M:%S'),
-                             "last_modified": order.last_modified.strftime('%Y-%m-%d %H:%M:%S'),  
-                             "items": items_data}, status=200)
+            
+        return JsonResponse({
+            "status": "success",
+            "order_id": order.id,
+            "service_type": order.service_type,
+            "order_status": order.status,
+            "total_price": order.total_price,
+            "note": order.note,
+            "time_created": order.time_created.strftime('%Y-%m-%d %H:%M:%S'),
+            "last_modified": order.last_modified.strftime('%Y-%m-%d %H:%M:%S'),
+            "items": items_data
+        }, status=200)
     return JsonResponse({"status": "error", "message": "Invalid request method"}, status=405)
         
 
