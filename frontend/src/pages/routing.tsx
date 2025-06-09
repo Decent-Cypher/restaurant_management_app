@@ -43,12 +43,12 @@ if (rootElement) {
                   <CartSummary />
                 </ProtectedRoute>
               } />
-              <Route path="/order/confirmation/:orderId" element={
+              <Route path="/order/confirmation/:order_id" element={
                 <ProtectedRoute>
                   <OrderConfirmation />
                 </ProtectedRoute>
               } />
-              <Route path="/order/payment/:orderId" element={
+              <Route path="/order/payment/:order_id" element={
                 <ProtectedRoute>
                   <Payment />
                 </ProtectedRoute>

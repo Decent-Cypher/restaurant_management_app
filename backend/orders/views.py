@@ -46,7 +46,7 @@ def get_bill(request: HttpResponse) -> JsonResponse:
         order_items = list(OrderItem.objects.filter(order_id=order_id).values('menu_item__name', 'quantity', 'menu_item__price'))
         items_data = []
         for item in order_items:
-            menu_item = MenuItem.objects.get(id=item["menu_item__id"])
+            menu_item = item["menu_item"]
             items_data.append({
                 "name": item["menu_item__name"],
                 "menu_item_id": item["menu_item__id"], 
