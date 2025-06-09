@@ -9,7 +9,6 @@ const ProtectedRoute = ({ children }) => {
   if (user === null) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
-  alert("ProtectedRoute: user is not null, user = " + JSON.stringify(user));
 
   return children;
 };
