@@ -43,7 +43,22 @@ def get_bill(request: HttpResponse) -> JsonResponse:
             return JsonResponse({"status": "error", "message": "Order not found"}, status=404)
 
         order_items = list(OrderItem.objects.filter(order_id=order_id).values('menu_item__name', 'quantity', 'menu_item__price'))
-        return JsonResponse({"status": "success", "order_id": order.id, "items": order_items})
+        items_data = []
+        for item in order_items:
+            items_data.append({
+                "name": item["menu_item__name"],
+                "quantity": item["quantity"],
+                "price": item["menu_item__price"]
+            })
+        return JsonResponse({"status": "success",                              
+                             "order_id": order.id,
+                             "service_type": order.service_type,
+                             "order_status": order.status,
+                             "total_price": order.total_price,
+                             "note": order.note,
+                             "time_created": order.time_created.strftime('%Y-%m-%d %H:%M:%S'),
+                             "last_modified": order.last_modified.strftime('%Y-%m-%d %H:%M:%S'),  
+                             "items": items_data}, status=200)
     return JsonResponse({"status": "error", "message": "Invalid request method"}, status=405)
         
 
