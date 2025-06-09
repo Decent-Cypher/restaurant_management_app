@@ -3,7 +3,6 @@ export const login = async (type, username, password) => {
   const formData = new URLSearchParams();
   formData.append('username', username);
   formData.append('password', password);
-
   const res = await fetch(url, {
     method: 'POST',
     body: formData,

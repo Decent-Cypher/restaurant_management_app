@@ -6,6 +6,7 @@ from pytest import Session
 from .models import Order, OrderItem, Payment
 from menu.models import MenuItem
 from accounts.models import Diner
+import json
 
 
 def get_order_by_id(request: HttpResponse) -> JsonResponse:
@@ -152,17 +153,18 @@ def submit_order(request: HttpResponse) -> JsonResponse:
     """
     Submit the order for processing
     """
-    # Protect view
-    if "diner_id" not in request.session:
-        return JsonResponse({"status": "error", "message": "Not authorized"}, status=403)
+    # # Protect view
+    # if "diner_id" not in request.session:
+    #     return JsonResponse({"status": "error", "message": "Not authorized"}, status=403)
         
     if request.method == "POST":
-        diner_id = request.POST.get("diner_id")
-        service_type = request.POST.get("service_type", "Dine-in")  # default to Dine-in
-        note = request.POST.get("note", "")
+        request_body = json.loads(request.body)
+        diner_id = request_body.get("diner_id")
+        service_type = request_body.get("service_type", "Dine-in")  # default to Dine-in
+        note = request_body.get("note", "")
         # address = request.POST.get("address", "")  # Optional, for delivery orders
-        ordered_items = request.POST.getlist("ordered_items")  # expecting list of item IDs
-        quantities = request.POST.getlist("quantities")         # matching list of quantities
+        ordered_items = request_body.get("ordered_items")  # expecting list of item IDs
+        quantities = request_body.get("quantities")         # matching list of quantities
         assert len(ordered_items) == len(quantities) and len(ordered_items) > 0, "Items and quantities mismatch or empty"
         
         try:

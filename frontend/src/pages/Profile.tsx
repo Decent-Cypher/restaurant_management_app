@@ -41,14 +41,14 @@ export default function Profile() {
 
   useEffect(() => {
     const fetchDinerInfo = async () => {
-      alert("Fetching diner info...");
+      // alert(`Fetching diner info... ${user.diner_id}`);
       try {
-        const response = await fetch("http://localhost:8000/api/accounts/diner/info/", {
+        const response = await fetch(`http://localhost:8000/api/accounts/diner/info/?diner_id=${user.diner_id}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
           },
-          credentials: "include", 
+          credentials: "include",
         });
 
         if (!response.ok) {
@@ -56,7 +56,7 @@ export default function Profile() {
         }
 
         const data = await response.json();
-        if (data.success) {
+        if (data.status === "success") {
           setDinerInfo(data.diner_info);
         } else {
           alert("Failed to fetch diner info.");
@@ -179,7 +179,7 @@ export default function Profile() {
       <div className="w-[280px] bg-white shadow-md rounded-xl m-4 flex flex-col py-6">
         <div className="flex flex-col items-center">
           <FaSmile className="text-4xl mb-2 text-gray-700" />
-          <span className="font-semibold text-lg">Khanh Tran</span>
+          <span className="font-semibold text-lg">{dinerInfo.name}</span>
         </div>
         <div className="mt-6 space-y-2">
           <SidebarItem

@@ -94,7 +94,7 @@ def get_diner_info(request: HttpRequest) -> JsonResponse:
                     "email": diner.email,
                     "phone_number": diner.phone_num,
                 }
-            })
+            }, status=200)
         else:
             return JsonResponse({"status": "error", "message": "Unauthorized access"}, status=403)
     return JsonResponse({"status": "error", "message": "Invalid request method"}, status=405)
