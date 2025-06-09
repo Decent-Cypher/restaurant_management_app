@@ -37,8 +37,8 @@ export default function Profile() {
     try {
       const data = await logout();
       if (data.success) {
-        await fetchUser();
         navigate("/");
+        await fetchUser();
       } else {
         alert("Logout failed. Please try again.");
       }
