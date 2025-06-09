@@ -45,9 +45,14 @@ urlpatterns = [
     path('api/accounts/logout/', account_views.logout_view, name='logout'),
     path('api/accounts/protected/', account_views.protected_view, name='protected'),
     path('api/accounts/diner/info/', account_views.get_diner_info, name='get_diner_info'),
+    path('api/accounts/manager/add/', account_views.add_accounts, name='add_accounts'),
+    path('api/accounts/manager/remove/', account_views.delete_accounts, name='delete_accounts'),
+    path('api/accounts/manager/update_role/', account_views.update_roles, name='update_roles'),
 
     # Menu URLs (using router)
     path('api/menu/', include(menu_router.urls)),
+    path('api/menu/items/add/', menu_views.add_menu_items, name='add_menu_items'),
+    path('api/menu/items/remove', menu_views.remove_menu_items, name='remove_menu_items'),
 
     # Orders URLs
     path('api/orders/get_order/', order_views.get_order_by_id, name='get_order_by_id'),
