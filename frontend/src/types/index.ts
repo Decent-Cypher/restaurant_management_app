@@ -22,14 +22,14 @@ export interface CartItem {
 }
 
 export interface Order {
-  id: number;
+  order_id: number;
   service_type: string;
-  diner_id: number;
+  order_status: string;
   total_price: number;
-  created_at: string;
+  time_created: string;
   last_modified: string;
   address: string | null;
-  note: string | null;
+  note: string;
   items: CartItem[];
 }
 

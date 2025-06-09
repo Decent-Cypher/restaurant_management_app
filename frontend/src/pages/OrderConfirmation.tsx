@@ -13,7 +13,7 @@ export default function OrderConfirmation() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch(`http://localhost:8000/api/orders/get_order/`)
+    fetch(`http://localhost:8000/api/orders/get_bill/?order_id=${order_id}`)
       .then((res) => res.json())
       .then((data) => {
         setOrder(data);
