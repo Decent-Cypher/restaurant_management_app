@@ -1,17 +1,84 @@
 import Layout from "../components/Layout";
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+
+// Define the API response data structures
+interface ApiMenuItem {
+  id: number;
+  name: string;
+  description: string;
+  price: number;
+  menu: number;
+  image: string;
+}
+
+// Define the display data structure for signature dishes
+interface SignatureDish {
+  id: number;
+  name: string;
+  price: string;
+  image: string;
+}
 
 export default function App() {
-  const signatureDishes = [
-    { id: 1, name: "Truffle Pasta", price: "$24", image: "/dishes/truffle-pasta.jpg" },
-    { id: 2, name: "Wagyu Steak", price: "$45", image: "/dishes/wagyu-steak.jpg" },
-    { id: 3, name: "Lobster Risotto", price: "$38", image: "/dishes/lobster-risotto.jpg" },
-    { id: 4, name: "Matcha Tiramisu", price: "$12", image: "/dishes/matcha-tiramisu.jpg" },
-  ];
-
+  const [signatureDishes, setSignatureDishes] = useState<SignatureDish[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
   const [email, setEmail] = useState("");
   const [subscribed, setSubscribed] = useState(false);
+
+  // Dummy signature dishes for error state
+  const dummySignatureDishes: SignatureDish[] = [
+    { id: 1, name: "Truffle Pasta", price: "$24", image: "https://placehold.co/300" },
+    { id: 2, name: "Wagyu Steak", price: "$45", image: "https://placehold.co/300" },
+    { id: 3, name: "Lobster Risotto", price: "$38", image: "https://placehold.co/300" },
+    { id: 4, name: "Matcha Tiramisu", price: "$12", image: "https://placehold.co/300" },
+  ];
+
+  useEffect(() => {
+    const fetchSignatureDishes = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        // Fetch menu items from API
+        const response = await fetch('http://localhost:8000/api/menu/menu-items/');
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch menu items: ${response.status}`);
+        }
+
+        const menuItems: ApiMenuItem[] = await response.json();
+
+        if (menuItems.length === 0) {
+          throw new Error('No menu items available');
+        }
+
+        // Select 4 random items from the menu
+        const shuffled = [...menuItems].sort(() => 0.5 - Math.random());
+        const randomItems = shuffled.slice(0, 4);
+
+        // Transform API data to signature dish format
+        const dishes: SignatureDish[] = randomItems.map(item => ({
+          id: item.id,
+          name: item.name,
+          price: `${item.price} vnd`,
+          image: item.image
+        }));
+
+        setSignatureDishes(dishes);
+      } catch (err) {
+        console.error('Error fetching signature dishes:', err);
+        setError(err instanceof Error ? err.message : 'Failed to load signature dishes');
+        // Set dummy data when there's an error
+        setSignatureDishes(dummySignatureDishes);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSignatureDishes();
+  }, []);
   
   const handleSubscribe = (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,7 +91,7 @@ export default function App() {
 
   return (
     <Layout title="Home | Cooking Mama" transparentHeader={true}>
-      {/* Background image or video */}
+      {/* Background video */}
       <div className="h-screen w-full relative">
         <video className="h-full w-full object-cover opacity-60" autoPlay loop muted playsInline>
           <source src="/home.mp4" type="video/mp4"/>
@@ -39,47 +106,81 @@ export default function App() {
       <div className="py-20 px-4 md:px-8 bg-white">
         <div className="text-center text-gray-900 max-w-7xl mx-auto">
           <h2 className="text-4xl font-bold mb-3">Our Signature</h2>
-          <p className="text-gray-600 mb-12 max-w-3xl mx-auto">
+          <p className="text-gray-600 mb-8 max-w-3xl mx-auto">
             Experience our most celebrated dishes, crafted with passion and premium ingredients.
           </p>
           
-          {/* Signature dishes */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
-            {signatureDishes.map((dish) => (
-              <div key={dish.id} className="group rounded-2xl overflow-hidden shadow-lg transition-all duration-300 hover:shadow-2xl">
-                <div className="h-64 overflow-hidden relative">
-                  <img 
-                    src={dish.image} 
-                    alt={dish.name} 
-                    className="w-full h-full object-cover transform transition-transform duration-700 group-hover:scale-110"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                  <div className="absolute bottom-4 right-4 bg-white/90 px-4 py-1 rounded-full font-semibold text-gray-800">
-                    {dish.price}
+          {/* Error message displayed under header when there's an error */}
+          {error && (
+            <div className="mb-8">
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4 max-w-2xl mx-auto">
+                <div className="flex items-center justify-center">
+                  <div className="flex-shrink-0">
+                    <svg className="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <div className="ml-3">
+                    <div className="text-sm text-red-800">
+                      <strong>Unable to load live menu data.</strong> Showing sample dishes. {error}
+                    </div>
                   </div>
                 </div>
-                <div className="p-4 bg-white">
-                  <h3 className="text-lg font-bold text-gray-800">{dish.name}</h3>
-                </div>
               </div>
-            ))}
-          </div>
+            </div>
+          )}
           
-          {/* Action buttons */}
-          <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Link 
-              to="/menu" 
-              className="px-8 py-3 rounded-full border-2 border-gray-800 text-gray-800 font-semibold hover:bg-gray-800 hover:text-white transition-colors duration-300"
-            >
-              View Full Menu
-            </Link>
-            <Link 
-              to="/order" 
-              className="px-8 py-3 rounded-full bg-[#1e2a59] text-white font-semibold hover:bg-blue-800 transition-colors duration-300"
-            >
-              Order Now!
-            </Link>
-          </div>
+          {/* Loading state */}
+          {loading ? (
+            <div className="flex justify-center items-center h-64">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-800"></div>
+              <span className="ml-4 text-lg text-gray-600">Loading signature dishes...</span>
+            </div>
+          ) : (
+            <>
+              {/* Signature dishes */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+                {signatureDishes.map((dish) => (
+                  <div key={dish.id} className="group rounded-2xl overflow-hidden shadow-lg transition-all duration-300 hover:shadow-2xl">
+                    <div className="h-64 overflow-hidden relative">
+                      <img 
+                        src={dish.image} 
+                        alt={dish.name} 
+                        className="w-full h-full object-cover transform transition-transform duration-700 group-hover:scale-110"
+                        onError={(e) => {
+                          // Fallback image if the API image fails to load
+                          e.currentTarget.src = '/dishes/placeholder.jpg';
+                        }}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                      <div className="absolute bottom-4 right-4 bg-white/90 px-4 py-1 rounded-full font-semibold text-gray-800">
+                        {dish.price}
+                      </div>
+                    </div>
+                    <div className="p-4 bg-white">
+                      <h3 className="text-lg font-bold text-gray-800">{dish.name}</h3>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              
+              {/* Action buttons */}
+              <div className="flex flex-col sm:flex-row justify-center gap-4">
+                <Link 
+                  to="/menu" 
+                  className="px-8 py-3 rounded-full border-2 border-gray-800 text-gray-800 font-semibold hover:bg-gray-800 hover:text-white transition-colors duration-300"
+                >
+                  View Full Menu
+                </Link>
+                <Link 
+                  to="/order" 
+                  className="px-8 py-3 rounded-full bg-[#1e2a59] text-white font-semibold hover:bg-blue-800 transition-colors duration-300"
+                >
+                  Order Now!
+                </Link>
+              </div>
+            </>
+          )}
         </div>
       </div>
 
