@@ -80,26 +80,21 @@ def get_diner_info(request: HttpRequest) -> JsonResponse:
     """
     Returns diner information
     """
-    print(request.session.items())
     if request.method == "GET":
-        if 'staff_id' in request.session:
-            staff = Staff.objects.get(id=request.session['staff_id'])
-            if staff.role == 'Manager':
-                diner_id = request.GET.get('diner_id')
-                try:
-                    diner = Diner.objects.get(id=diner_id)
-                except Diner.DoesNotExist:
-                    return JsonResponse({"status": "error", "message": "Diner not found"}, status=404)
-                return JsonResponse({
-                    "status": "success",
-                    "diner_info": {
-                        "name": diner.name,
-                        "email": diner.email,
-                        "phone_number": diner.phone_num,
-                    }
-                })
-            else:
-                return JsonResponse({"status": "error", "message": "Unauthorized access"}, status=403)
+        if 'diner_id' in request.session:
+            diner_id = request.GET.get('diner_id')
+            try:
+                diner = Diner.objects.get(id=diner_id)
+            except Diner.DoesNotExist:
+                return JsonResponse({"status": "error", "message": "Diner not found"}, status=404)
+            return JsonResponse({
+                "status": "success",
+                "diner_info": {
+                    "name": diner.name,
+                    "email": diner.email,
+                    "phone_number": diner.phone_num,
+                }
+            })
         else:
             return JsonResponse({"status": "error", "message": "Unauthorized access"}, status=403)
     return JsonResponse({"status": "error", "message": "Invalid request method"}, status=405)
@@ -110,7 +105,6 @@ def add_accounts(request: HttpRequest) -> JsonResponse:
     """
     Add account for new staff -> Store to diner database
     """
-    print(request.session.items())
     if request.method == "POST":
         if 'staff_id' in request.session:
             staff = Staff.objects.get(id=request.session['staff_id'])
@@ -128,10 +122,62 @@ def add_accounts(request: HttpRequest) -> JsonResponse:
                     email=email,
                 )
                 new_staff.save()
+                return JsonResponse({"status": "success", "message": "Staff account created successfully"}, status=201)
             else:
                 return JsonResponse({"status": "error", "message": "Unauthorized access"}, status=403)
         else:
-            print("YEAH")
             return JsonResponse({"status": "error", "message": "Unauthorized access"}, status=403)
     return JsonResponse({"status": "error", "message": "Invalid request method"}, status=405)
-            
+
+
+@csrf_exempt
+def delete_accounts(request: HttpRequest) -> JsonResponse:
+    """
+    Delete staff accounts
+    """
+    if request.method == "POST":
+        if 'staff_id' in request.session:
+            staff = Staff.objects.get(id=request.session['staff_id'])
+            if staff.role == 'Manager':
+                staff_id = request.POST.get("staff_id")
+                if not staff_id:
+                    return JsonResponse({"status": "error", "message": "Missing required fields"}, status=400)
+                try:
+                    staff_to_delete = Staff.objects.get(id=staff_id)
+                    staff_to_delete.delete()
+                    return JsonResponse({"status": "success", "message": "Staff account deleted successfully"}, status=200)
+                except Staff.DoesNotExist:
+                    return JsonResponse({"status": "error", "message": "Staff not found"}, status=404)
+            else:
+                return JsonResponse({"status": "error", "message": "Unauthorized access"}, status=403)
+        else:
+            return JsonResponse({"status": "error", "message": "Unauthorized access"}, status=403)
+    return JsonResponse({"status": "error", "message": "Invalid request method"}, status=405)
+
+@csrf_exempt
+def update_roles(request: HttpRequest) -> JsonResponse:
+    """
+    Update staff roles
+    """
+    if request.method == "POST":
+        if 'staff_id' in request.session:
+            staff = Staff.objects.get(id=request.session['staff_id'])
+            if staff.role == 'Manager':
+                staff_id = request.POST.get("staff_id")
+                new_role = request.POST.get("new_role")
+                if not staff_id or not new_role:
+                    return JsonResponse({"status": "error", "message": "Missing required fields"}, status=400)
+                if new_role not in ['Manager', 'Waiter', 'Chef']:
+                    return JsonResponse({"status": "error", "message": "Invalid role"}, status=400)
+                try:
+                    staff_to_update = Staff.objects.get(id=staff_id)
+                    staff_to_update.role = new_role
+                    staff_to_update.save()
+                    return JsonResponse({"status": "success", "message": "Staff role updated successfully"}, status=200)
+                except Staff.DoesNotExist:
+                    return JsonResponse({"status": "error", "message": "Staff not found"}, status=404)
+            else:
+                return JsonResponse({"status": "error", "message": "Unauthorized access"}, status=403)
+        else:
+            return JsonResponse({"status": "error", "message": "Unauthorized access"}, status=403)
+    return JsonResponse({"status": "error", "message": "Invalid request method"}, status=405)
