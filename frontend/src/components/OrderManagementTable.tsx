@@ -110,7 +110,7 @@ export default function OrderManagementTable({ className = "" }: OrderManagement
     }
   };
 
-  // Remove selected orders via API
+  // Remove selected orders via API - DEPRECATEDLY DEPRECATED
   const handleRemoveOrders = async () => {
     if (selectedOrders.length === 0) {
       alert("Please select orders to remove");
@@ -180,12 +180,12 @@ export default function OrderManagementTable({ className = "" }: OrderManagement
   };
 
   return (
-    <div className={`bg-white rounded-2xl shadow-lg overflow-hidden ${className}`}>
+    <div className={`bg-white overflow-hidden ${className}`}>
       {/* Header */}
-      <div className="px-6 py-4 border-b border-gray-200">
+      <div className="border-b border-gray-200">
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Order Management</h1>
+            <h1 className="text-2xl font-semibold text-gray-900">Order Management</h1>
             <p className="text-gray-600 mt-1">Manage and track all restaurant orders</p>
           </div>
           <div className="flex space-x-3">
@@ -199,7 +199,7 @@ export default function OrderManagementTable({ className = "" }: OrderManagement
               </svg>
               <span>{isAddingOrder ? "Adding..." : "Add Order"}</span>
             </button>
-            <button
+            {/* <button
               onClick={handleRemoveOrders}
               disabled={selectedOrders.length === 0 || isRemovingOrders}
               className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition duration-200 flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -210,7 +210,7 @@ export default function OrderManagementTable({ className = "" }: OrderManagement
               <span>
                 {isRemovingOrders ? "Removing..." : `Remove (${selectedOrders.length})`}
               </span>
-            </button>
+            </button> */}
           </div>
         </div>
       </div>
@@ -316,7 +316,7 @@ export default function OrderManagementTable({ className = "" }: OrderManagement
                         {order.service_type}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        ${order.total_price.toFixed(2)}
+                        {order.total_price} vnd
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {formatDate(order.time_created)}
