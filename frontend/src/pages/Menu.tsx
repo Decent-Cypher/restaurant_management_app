@@ -181,7 +181,7 @@ export default function Menu() {
             .map(item => ({
               id: item.id,
               name: item.name,
-              price: `$${item.price.toFixed(2)}`, // Format price as string
+              price: `${item.price} vnd`,
               image: item.image,
               description: item.description
             }));
