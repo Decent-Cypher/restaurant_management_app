@@ -193,7 +193,7 @@ def submit_order(request: HttpResponse) -> JsonResponse:
     Submit the order for processing
     """
     # Protect view
-    # print(request.session)
+    print(request.session.items())
     if "diner_id" not in request.session:
         return JsonResponse({"status": "error", "message": "Not authorized"}, status=403)
         

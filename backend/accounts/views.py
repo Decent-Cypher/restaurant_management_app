@@ -86,8 +86,6 @@ def get_diner_info(request: HttpRequest) -> JsonResponse:
     """
     Returns diner information
     """
-    print(request.session.keys())
-    print(request.session.items())
     if request.method == "GET":
         if 'diner_id' in request.session:
             diner_id = request.GET.get('diner_id')
@@ -167,9 +165,6 @@ def update_roles(request: HttpRequest) -> JsonResponse:
     """
     Update staff roles
     """
-    print("Session items:", list(request.session.items()))
-    print(request.method)
-    print("Incoming cookies:", request.COOKIES)
     if request.method == "POST":
         if 'staff_id' in request.session:
             staff = Staff.objects.get(id=request.session['staff_id'])
