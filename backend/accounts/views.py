@@ -72,3 +72,31 @@ def protected_view(request: HttpRequest) -> JsonResponse:
         return JsonResponse({'success': True, 'message': 'Hello Diner Bro', 'diner_id': request.session['diner_id']})
     return JsonResponse({'success': False, 'error': 'Not logged in'}, status=403)
 
+@csrf_exempt
+def get_diner_info(request: HttpRequest) -> JsonResponse:
+    """
+    Returns diner information
+    """
+    if request.method == "GET":
+        if 'staff_id' in request.session:
+            staff = Staff.objects.get(id=request.session['staff_id'])
+            if staff.role == 'Manager':
+                diner_id = request.GET.get('diner_id')
+                try:
+                    diner = Diner.objects.get(id=diner_id)
+                except Diner.DoesNotExist:
+                    return JsonResponse({"status": "error", "message": "Diner not found"}, status=404)
+                return JsonResponse({
+                    "status": "success",
+                    "diner_info": {
+                        "name": diner.name,
+                        "email": diner.email,
+                        "phone_number": diner.phone_num,
+                    }
+                })
+            else:
+                return JsonResponse({"status": "error", "message": "Unauthorized access"}, status=403)
+        else:
+            return JsonResponse({"status": "error", "message": "Unauthorized access"}, status=403)
+    return JsonResponse({"status": "error", "message": "Invalid request method"}, status=405)
+            
