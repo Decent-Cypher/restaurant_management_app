@@ -1,11 +1,20 @@
 # filepath: /home/baku/Coding/restaurant_management_app/backend/orders/management/commands/seed_db.py
+from tokenize import group
+from tracemalloc import start
 from django.core.management.base import BaseCommand
 from accounts.models import Staff, Diner
 from menu.models import Menu, MenuItem
 from orders.models import Order, OrderItem, Payment
 from reviews.models import Feedback
+from django.utils.timezone import make_aware
+from datetime import datetime, timedelta
+import random
+
+random.seed(10)
 
 import os
+
+
 
 class Command(BaseCommand):
     help = 'Seeds the database with initial data if it is empty'
@@ -130,7 +139,108 @@ class Command(BaseCommand):
             order_item_mbappe_kimbap = OrderItem.objects.create(order=order_mbappe, menu_item=menu_item_kimbap_bo_bulgogi, quantity=1)
             order_item_mbappe_tra = OrderItem.objects.create(order=order_mbappe, menu_item=menu_item_tra_sua_gao_nho, quantity=2)
             
+            # Seeding more example orders
+            end_date = datetime(2025, 5, 31, 23, 59, 59)
+            start_date = end_date - timedelta(days=365)
+            def get_random_datetime():
+                while True:
+                    dt = start_date + timedelta(seconds=random.randint(0, int((end_date - start_date).total_seconds())))
+                    weekday = dt.weekday()
+                    if random.random() < ([0.8 if weekday >= 5 else 0.2][0]):  # higher chance on Sat/Sun
+                        return make_aware(dt)
+            service_types = ['Dine-In'] * 6 + ['Takeout'] * 3 + ['Delivery']
+            # Collecting all menu items for random selection
+            all_menu_items = [
+                menu_item_box_7_3,
+                menu_item_box_ga_3_vi,
+                menu_item_box_han_1_5,
+                menu_item_box_han_1,
+                menu_item_box_han_2,
+                menu_item_box_han_3,
+                menu_item_box_mandu,
+
+                menu_item_carbonara_tteokbokki,
+                menu_item_com_ca_ri_thit_cot_let_chien_xu,
+                menu_item_com_tron_bibimbap,
+                menu_item_mien_tron,
+                menu_item_ram_don,
+                menu_item_tteokbokki_cha_ca,
+
+                menu_item_kimbap_bo_bulgogi,
+                menu_item_kimbap_bo_pho_mai_chay,
+                menu_item_kimbap_ca_ngu_cai_vang,
+                menu_item_kimbap_chien,
+                menu_item_kimbap_ga_gion_cajun,
+                menu_item_kimbap_heo_nuong_galbi,
+                menu_item_kimbap_pho_mai,
+                menu_item_kimbap_suon_bo_bbq,
+                menu_item_kimbap_tom_sot_guyumi,
+                menu_item_kimbap_xa_xiu,
+                menu_item_kimbibi,
+
+                menu_item_tra_cam_buoi_nhiet_doi,
+                menu_item_tra_chanh_leo,
+                menu_item_tra_dao_cam_xa,
+                menu_item_tra_hoa_qua_dac_biet,
+                menu_item_tra_kiwi_hoa_com_chay,
+                menu_item_tra_sua_gao_nho,
+                menu_item_tra_sua_tran_chau,
+                menu_item_tra_vai
+            ]
             
+            list_generated_orders = []
+            list_generated_orderitems = []
+            list_generated_payments = []
+            for _ in range(10_000):
+                diner = random.choice([diner_giap, diner_binh, diner_khanh, diner_bao, diner_tu, diner_mbappe, diner_messi])
+                service_type = random.choice(service_types)
+                status = 'COMPLETED'
+                group_size = random.choices([1, 2, 3, 4, 5, 6, 7, 8], weights=[20, 25, 15, 10, 10, 8, 7, 5])[0]
+                # Select 1 to 2 items per person in the group
+                num_items = random.randint(group_size, group_size * 2)
+                selected_items = random.choices(                all_menu_items, k=num_items)
+                # Count the quantity of each selected item and calculate total price
+                item_counts = {}
+                total_price = 0
+                for item in selected_items:
+                    if item.id in item_counts:
+                        item_counts[item.id]['quantity'] += 1
+                    else:
+                        item_counts[item.id] = {'menu_item': item, 'quantity': 1}
+                    total_price += item.price
+                    
+                # Create the order
+                order = Order(
+                    service_type=service_type,
+                    diner=diner,
+                    status=status,
+                    total_price=total_price,
+                    time_created=get_random_datetime(),
+                )
+                list_generated_orders.append(order)
+                
+                # Create the OrderItem objects
+                for item_id, item_data in item_counts.items():
+                    item = OrderItem(
+                        order=order,
+                        menu_item=item_data['menu_item'],
+                        quantity=item_data['quantity']
+                    )
+                    list_generated_orderitems.append(item)
+                    
+                payment = Payment(
+                    order=order,
+                    method=random.choice(['CASH', 'ONLINE_BANKING']),
+                    status='paid'
+                )
+                list_generated_payments.append(payment)
+                
+            # Bulk create all generated orders, order items, and payments
+            Order.objects.bulk_create(list_generated_orders)
+            OrderItem.objects.bulk_create(list_generated_orderitems)
+            Payment.objects.bulk_create(list_generated_payments)
+                
+                
             # Example seeding for Payment
             payment_k = Payment.objects.create(order=order_k, method='CASH', status='unpaid')
             payment_b = Payment.objects.create(order=order_b, method='CASH', status='unpaid')
@@ -140,6 +250,17 @@ class Command(BaseCommand):
             # Example seeding for Feedback
             feedback_mbappe = Feedback.objects.create(order=order_mbappe, rating=5, comment="Great service!")
             feedback_messi = Feedback.objects.create(order=order_messi, rating=4, comment="The food was delicious, but the drinks were too sweet.")
+            list_generated_feedbacks = []
+            for _ in range(1412):
+                # Randomly select one of the orders created above (no comment, and the distribution will be [0.1, 0.05, 0.14, 0.31, 0.4]). The time created will be random within the last 365 days. They won't be associated with any order.
+                list_generated_feedbacks.append(
+                    Feedback(
+                        rating=random.choices([1, 2, 3, 4, 5], weights=[10, 5, 14, 31, 40])[0],
+                        comment="",
+                        time_created=get_random_datetime()
+                    )
+                )
+            Feedback.objects.bulk_create(list_generated_feedbacks)
             
             self.stdout.write(self.style.SUCCESS('Database seeded successfully.'))
         else:

@@ -54,10 +54,14 @@ def logout_view(request: HttpRequest) -> JsonResponse:
     Logs out either a staff or diner by clearing the session.
     """
     if request.method == 'POST':
-        request.session.flush()  # Clears all session data
-        return JsonResponse({'success': True}, status=200)
+        try:
+            request.session.flush()  # Clears all session data
+            return JsonResponse({'success': True}, status = 200)
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)}, status=500)
     return JsonResponse({'error': 'Only POST allowed'}, status=405)
 
+@csrf_exempt
 def protected_view(request: HttpRequest) -> JsonResponse:
     """
     Example view that requires a staff or diner to be logged in.
@@ -68,7 +72,7 @@ def protected_view(request: HttpRequest) -> JsonResponse:
         # Check if staff has manager role by querying the database
         return JsonResponse({'success': True, 'message': 'Hello Staff Bro', 'staff_id': request.session['staff_id'], 'role': staff.role})
     elif 'diner_id' in request.session:
-        return JsonResponse({'success': True, 'message': 'Hello Diner Bro', 'diner_id': request.session['diner_id']})
+        return JsonResponse({'success': True, 'message': 'Hello Diner Bro', 'diner_id': request.session['diner_id'], 'role': 'Diner'})
     return JsonResponse({'success': False, 'error': 'Not logged in'}, status=403)
 
 @csrf_exempt

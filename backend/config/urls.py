@@ -25,7 +25,7 @@ from accounts import views as account_views
 from menu import views as menu_views
 from orders import views as order_views
 from reviews import views as review_views
-# from analytics import views as analytics_views # Uncomment when analytics views are ready
+from analytics import views as analytics_views 
 
 # Routers for ViewSets
 menu_router = DefaultRouter()
@@ -34,6 +34,7 @@ menu_router.register(r'menu-items', menu_views.MenuItemViewSet, basename='menuit
 
 review_router = DefaultRouter()
 review_router.register(r'feedbacks', review_views.FeedbackViewSet, basename='feedback')
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -66,6 +67,9 @@ urlpatterns = [
     # Reviews URLs (using router)
     path('api/reviews/', include(review_router.urls)),
 
-    # Analytics URLs (add paths here when views are created)
-    # path('api/analytics/...', analytics_views.some_view, name='some_analytics_view'),
+    # Analytics URLs
+    path('api/analytics/rating/', analytics_views.get_rating_analytics, name='get_rating_analytics'),
+    path('api/analytics/revenue/', analytics_views.get_revenue_analytics, name='get_revenue_analytics'),
+    path('api/analytics/order-count/', analytics_views.get_menu_items_order_count, name='get_order_count'),
+
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

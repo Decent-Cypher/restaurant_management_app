@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 
 interface HeaderProps {
   transparent?: boolean;
@@ -8,6 +9,12 @@ interface HeaderProps {
 export default function Header({ transparent = false }: HeaderProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const { user } = useAuth();
+  // if (user) {
+  //   alert(`Welcome back, ${user.role}!`);
+  // } else {
+  //   alert("Welcome to Cooking Mama!");
+  // }
   
   useEffect(() => {
     if (!transparent) return;
@@ -27,6 +34,47 @@ export default function Header({ transparent = false }: HeaderProps) {
           : 'bg-transparent text-white'
       }`
     : 'sticky top-0 w-full z-50 bg-gray-800 text-white';
+
+  const renderUserLink = () => {
+    let label = "Login";
+    let path = "/login";
+
+    if (user) {
+      switch (user.role) {
+        case "Diner":
+          label = "Profile";
+          path = "/profile";
+          break;
+        case "Waiter":
+          label = "Order Management";
+          path = "/staff/orders";
+          break;
+        case "Chef":
+          label = "Order Management";
+          path = "/staff/orders";
+          break;
+        case "Manager":
+          label = "Settings";
+          path = "/settings";
+          break;
+        default:
+          label = "Login";
+          path = "/login";
+      }
+    }
+
+    // alert(`label: ${label}, path: ${path}`);
+    return (
+      <li>
+        <Link
+          to={path}
+          className={`hover:${isScrolled ? "text-gray-600" : "text-gray-300"}`}
+        >
+          {label}
+        </Link>
+      </li>
+    );
+  };
   
   return (
     <header className={`py-6 px-12 ${headerClasses}`}>
@@ -40,7 +88,7 @@ export default function Header({ transparent = false }: HeaderProps) {
             <li><Link to="/" className={`hover:${isScrolled ? 'text-gray-600' : 'text-gray-300'}`}>Home</Link></li>
             <li><Link to="/menu" className={`hover:${isScrolled ? 'text-gray-600' : 'text-gray-300'}`}>Menu</Link></li>
             <li><Link to="/order" className={`hover:${isScrolled ? 'text-gray-600' : 'text-gray-300'}`}>Order</Link></li>
-            <li><Link to="/login" className={`hover:${isScrolled ? 'text-gray-600' : 'text-gray-300'}`}>Login</Link></li>
+            {renderUserLink()}
           </ul>
         </nav>
         
@@ -60,7 +108,7 @@ export default function Header({ transparent = false }: HeaderProps) {
             <li><Link to="/" className={`block hover:${isScrolled ? 'text-gray-600' : 'text-gray-300'}`}>Home</Link></li>
             <li><Link to="/menu" className={`block hover:${isScrolled ? 'text-gray-600' : 'text-gray-300'}`}>Menu</Link></li>
             <li><Link to="/order" className={`block hover:${isScrolled ? 'text-gray-600' : 'text-gray-300'}`}>Order</Link></li>
-            <li><Link to="/login" className={`block hover:${isScrolled ? 'text-gray-600' : 'text-gray-300'}`}>Login</Link></li>
+            {renderUserLink()}
           </ul>
         </div>
       )}
