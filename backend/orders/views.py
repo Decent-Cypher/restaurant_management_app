@@ -48,11 +48,11 @@ def get_bill(request: HttpResponse) -> JsonResponse:
         for item in order_items:
             menu_item = item["menu_item"]
             items_data.append({
-                "name": item["menu_item__name"],
-                "menu_item_id": item["menu_item__id"], 
+                "name": menu_item["menu_item__name"],
+                "menu_item_id": menu_item["menu_item__id"], 
                 "image" : menu_item["image"] if hasattr(menu_item, "image") else None,  # Optional image field
                 "quantity": item["quantity"],
-                "price": item["menu_item__price"]
+                "price": menu_item["menu_item__price"]
             })
         return JsonResponse({"status": "success",                              
                              "order_id": order.id,
