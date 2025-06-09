@@ -2,24 +2,56 @@ import { useState, useEffect } from 'react';
 import { useCart } from '../contexts/CartContext';
 import type { ServiceType } from '../contexts/CartContext';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import Layout from '../components/Layout';
+import OrderLayout from '../components/OrderLayout';
 import OrderedItemLayout from '../components/OrderedItemLayout';
 import { CartItem, Order } from '../types';
 
+const defaultOrder: Order = {
+  order_id: 0,
+  service_type: "",
+  order_status: "",
+  total_price: 0,
+  time_created: "",
+  last_modified: "",
+  address: null,
+  note: "",
+  items: [],
+};
+
+
 export default function OrderConfirmation() {
   const { order_id } = useParams();
-  const [order, setOrder] = useState<Order| null>(null);
+  const [order, setOrder] = useState<Order>(defaultOrder);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch(`http://localhost:8000/api/order/orders/${order_id}/`)
+    fetch(`http://localhost:8000/api/orders/get_bill/?order_id=${order_id}`)
       .then((res) => res.json())
       .then((data) => {
-        setOrder(data);
+        const cartItems: CartItem[] = data.items.map((item: any) => ({
+          id: item.id,
+          name: item.name,
+          price: item.price,
+          quantity: item.quantity,
+          image: item.image,
+        }));
+
+        const order: Order = {
+          order_id: data.order_id,
+          service_type: data.service_type,
+          order_status: data.order_status,
+          total_price: data.total_price,
+          time_created: data.time_created,
+          last_modified: data.last_modified,
+          address: data.address,
+          note: data.note,
+          items: cartItems,
+        };
+
+        setOrder(order);
         setIsLoading(false);
-      }
-      )
+      })
       .catch((error) => { 
         console.error("Failed to fetch order:", error);
         setIsLoading(false);
@@ -27,14 +59,14 @@ export default function OrderConfirmation() {
     );
   }, [order_id]);
 
-
+  
   const getTotalQuantity = () => {
     return order?.items.reduce((total, item) => total + item.quantity, 0) || 0;
   };
 
   const handleMakePayment = () => {
     if (!order) return;
-    navigate(`/order/payment/${order.id}`);
+    navigate(`/order/payment/${order_id}`);
   };
 
   const setOrderToCart = (order:Order) => {
@@ -67,7 +99,7 @@ export default function OrderConfirmation() {
   }
 
   return (
-    <Layout title='Order Confirmation'>
+    <OrderLayout>
       <div className="px-8 pt-6 pb-8 flex gap-6 items-start">
         <div className="flex-1">
           <div className="flex justify-between items-center mb-6 ">
@@ -93,7 +125,7 @@ export default function OrderConfirmation() {
                 <p className="font-semibold">Ordered items ({getTotalQuantity()})</p>
                 <div className="flex justify-between pt-2">
                   <span>Sub-total:</span>
-                  <span>{order.total_price} VND</span>
+                  <span>{order.total_price.toLocaleString()} VND</span>
                 </div>
                 {order.service_type === "Delivery" && (
                   <div className="flex justify-between items-center pt-1">
@@ -160,7 +192,7 @@ export default function OrderConfirmation() {
           </div>
         </div>
       </div>
-    </Layout>
+    </OrderLayout>
   );
 }
 

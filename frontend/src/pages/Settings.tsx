@@ -1,10 +1,13 @@
 import React from "react";
-import { FaSmile, FaMapMarkerAlt, FaBuilding, FaShoppingCart, FaPhone, FaFileInvoice, FaFilePdf, FaVideo, FaWifi, FaGoogle, FaSignOutAlt } from "react-icons/fa";
+import { FaUserTie, FaBars, FaUser, FaChartBar, FaShoppingCart, FaSignOutAlt, FaSmile} from "react-icons/fa";
 import { useState, useEffect } from "react";
 import { logout } from "../api/auth";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
-import { Diner } from "../types";
+import OrderManagementTable from "../components/OrderManagementTable";
+import AnalyticsDashboard from "../components/AnalyticsDashboard";
+
+
 
 const SidebarItem = ({
   icon: Icon,
@@ -29,50 +32,14 @@ const SidebarItem = ({
 );
 
 
-export default function Profile() {
+export default function Settings() {
   const [activePanel, setActivePanel] = useState("Personal Information");
   const navigate = useNavigate();
-  const { user, fetchUser } = useAuth();
-  const [dinerInfo, setDinerInfo] = useState<Diner>({
-    name: "",
-    email: "",
-    phone_number: "",
-  });
+  const { fetchUser } = useAuth();
 
-  useEffect(() => {
-    const fetchDinerInfo = async () => {
-      // alert(`Fetching diner info... ${user.diner_id}`);
-      try {
-        const response = await fetch(`http://localhost:8000/api/accounts/diner/info/?diner_id=${user.diner_id}`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-        });
 
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const data = await response.json();
-        if (data.status === "success") {
-          setDinerInfo(data.diner_info);
-        } else {
-          alert("Failed to fetch diner info.");
-        }
-      } catch (error) {
-        console.error("Error fetching diner info:", error);
-      }
-    };
-    
-    if (user) {
-      fetchDinerInfo();
-    }
-  }, [user]); 
-  
   const handleLogout = async () => {
-    try {
+    try {``
       const data = await logout();
       if (data.success) {
         navigate("/");
@@ -93,28 +60,43 @@ export default function Profile() {
             <h2 className="text-2xl font-semibold mb-6">Personal Information</h2>
             <div className="grid grid-cols-2 gap-6">
               <div>
-                <label className="block font-semibold mb-1">Name</label>
-                <input type="text" value={dinerInfo.name || ""} disabled className="w-full bg-gray-100 p-2 rounded" />
+                <label className="block font-semibold mb-1">First name</label>
+                <input type="text" disabled className="w-full bg-gray-100 p-2 rounded" />
               </div>
-
+              <div>
+                <label className="block font-semibold mb-1">Last name</label>
+                <input type="text" value="Tran" disabled className="w-full bg-gray-100 p-2 rounded" />
+              </div>
+              <div>
+                <label className="block font-semibold mb-1">Nick name</label>
+                <input type="text" disabled className="w-full bg-gray-100 p-2 rounded" />
+              </div>
               <div>
                 <label className="block font-semibold mb-1">Phone number</label>
                 <div className="flex">
                   <span className="bg-gray-200 px-3 py-2 rounded-l text-sm">(+84)</span>
-                  <input type="text" value={dinerInfo.phone_number || ""} disabled className="w-full bg-gray-100 p-2 rounded-r" />
+                  <input type="text" disabled className="w-full bg-gray-100 p-2 rounded-r" />
                 </div>
               </div>
-
+              <div>
+                <label className="block font-semibold mb-1">Birthday</label>
+                <input type="text" value="13/06/2002" disabled className="w-full bg-gray-100 p-2 rounded" />
+              </div>
+              <div>
+                <label className="block font-semibold mb-1">Gender</label>
+                <select disabled className="w-full bg-gray-100 p-2 rounded">
+                  <option>Female</option>
+                </select>
+              </div>
               <div className="col-span-2">
                 <label className="block font-semibold mb-1">Email address</label>
                 <div className="flex">
                   <span className="bg-gray-200 px-3 py-2 rounded-l">
-                    <FaGoogle />
+                    {/* <FaGoogle /> */}
                   </span>
-                  <input type="text" value={dinerInfo.email || ""} disabled className="w-full bg-gray-100 p-2 rounded-r" />
+                  <input type="text" disabled className="w-full bg-gray-100 p-2 rounded-r" />
                 </div>
               </div>
-              
             </div>
             <div className="mt-6">
               <button className="bg-[#1a2a5b] text-white font-semibold py-2 px-6 rounded-full shadow-md hover:bg-[#16224a]">
@@ -167,6 +149,20 @@ export default function Profile() {
             </div>
           </div>
         );
+      
+      case "Order Management":
+        return (
+          <div>
+            <OrderManagementTable />
+          </div>
+        );
+      
+      case "Analytics":
+        return (
+          <div>
+            <AnalyticsDashboard />
+          </div>
+        );
 
       default:
         return null;
@@ -179,20 +175,38 @@ export default function Profile() {
       <div className="w-[280px] bg-white shadow-md rounded-xl m-4 flex flex-col py-6">
         <div className="flex flex-col items-center">
           <FaSmile className="text-4xl mb-2 text-gray-700" />
-          <span className="font-semibold text-lg">{dinerInfo.name}</span>
+          <span className="font-semibold text-lg">Khanh Tran</span>
         </div>
         <div className="mt-6 space-y-2">
           <SidebarItem
             icon={FaSmile}
-            label="Personal Information"
-            active={activePanel === "Personal Information"}
-            onClick={() => setActivePanel("Personal Information")}
+            label="Staff Management"
+            active={activePanel === "Staff Management"}
+            onClick={() => setActivePanel("Staff Management")}
           />
           <SidebarItem
             icon={FaShoppingCart}
-            label="Order History"
-            active={activePanel === "Order History"}
-            onClick={() => setActivePanel("Order History")}
+            label="Order Management"
+            active={activePanel === "Order Management"}
+            onClick={() => setActivePanel("Order Management")}
+          />
+          <SidebarItem
+            icon={FaBars}
+            label="Menus Management"
+            active={activePanel === "Menus Management"}
+            onClick={() => setActivePanel("Menus Management")}
+          />
+          <SidebarItem
+            icon={FaUser}
+            label="Customers Management"
+            active={activePanel === "Customers Management"}
+            onClick={() => setActivePanel("Customers Management")}
+          />
+          <SidebarItem
+            icon={FaChartBar}
+            label="Analytics"
+            active={activePanel === "Analytics"}
+            onClick={() => setActivePanel("Analytics")}
           />
         </div>
         <div className="mt-auto px-4 pt-6">

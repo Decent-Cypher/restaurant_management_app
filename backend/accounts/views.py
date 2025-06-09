@@ -13,6 +13,8 @@ def staff_login(request: HttpRequest) -> JsonResponse:
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
+        print(username)
+        print(password)
 
         try:
             staff = Staff.objects.get(name=username)
@@ -36,11 +38,13 @@ def diner_login(request: HttpRequest) -> JsonResponse:
     """
     Example diner login view that sets a session cookie on success.
     """
-    print(request.session.items())
+
+    # Access a specific cookie
+    session_id = request.COOKIES.get('sessionid')
+    print("Session ID:", session_id)
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
-        
         try:
             diner = Diner.objects.get(name=username)
         except Diner.DoesNotExist:
@@ -100,7 +104,7 @@ def get_diner_info(request: HttpRequest) -> JsonResponse:
                     "email": diner.email,
                     "phone_number": diner.phone_num,
                 }
-            })
+            }, status=200)
         else:
             return JsonResponse({"status": "error", "message": "Unauthorized access"}, status=403)
     return JsonResponse({"status": "error", "message": "Invalid request method"}, status=405)

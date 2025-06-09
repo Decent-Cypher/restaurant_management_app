@@ -22,7 +22,7 @@ export default function Login() {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
-    
+    // alert(`Mapping: ${MAPPING[userType]}, username ${username}, pass: ${password}`)
     try {
       const data = await login(MAPPING[userType], username, password);
       

@@ -5,6 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import OrderLayout from '../components/OrderLayout';
 import CartItemLayout from '../components/CartItemLayout';
 import { CartItem } from '../types';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function CartSummary() {
   const {
@@ -12,7 +13,7 @@ export default function CartSummary() {
     tableNumber, setTableNumber, calculateSubTotal, clearCart,
     calculateTotal, calculateTax, getTotalQuantity
   } = useCart();
-
+  const { user } = useAuth();
   const [isCheckout, setIsCheckout] = useState(false);
   const navigate = useNavigate();
   const [note, setNote] = useState("");
@@ -49,23 +50,26 @@ export default function CartSummary() {
 
     setIsCheckout(true);
 
-    const formData = new FormData();
-    formData.append('diner_id', '1');
-    formData.append('service_type', serviceType);
-
-    if (note) formData.append('note', note);
-    if (address && serviceType === 'Delivery') formData.append('address', address);
-
     const orderedItems = cartItems.map(item => item.id);
     const quantities = cartItems.map(item => item.quantity);
 
-    orderedItems.forEach(id => formData.append('ordered_items', id.toString()));
-    quantities.forEach(qty => formData.append('quantities', qty.toString()));
+    const inputData = {
+      'diner_id': user.diner_id,
+      'service_type': serviceType,
+      'ordered_items': orderedItems,
+      'quantities': quantities,
+    }
+
+    if (note) inputData['note'] = note;
+    // if (address && serviceType === 'Delivery') inputData['address'] = address;
 
     try {
       const res = await fetch('http://localhost:8000/api/orders/submit/', {
+        headers: {
+          "Content-Type": "application/json",
+        },
         method: 'POST',
-        body: formData,
+        body: JSON.stringify(inputData),
       });
 
       const data = await res.json();

@@ -9,7 +9,6 @@ interface CartItemProps {
 export default function CartItemLayout({item}: CartItemProps) {
   const {addToCart, removeFromCart, decreaseQuantity, getItemPrice} = useCart();
   const itemPrice = getItemPrice(item.price, item.quantity);
-
   return (
     <div className="bg-white rounded-xl p-4 mb-4 shadow-sm relative">
       <button onClick={() => removeFromCart(item.id)} className="absolute top-2 right-2 text-gray-500 hover:text-black">

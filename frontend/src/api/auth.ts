@@ -1,17 +1,16 @@
 export const login = async (type, username, password) => {
-  const url = `http://localhost:8000/api/accounts/${type}/login/`; // type = 'staff' or 'diner'
-  const formData = new URLSearchParams();
-  formData.append('username', username);
-  formData.append('password', password);
+  const formData = new FormData();
+  formData.append("username", username);
+  formData.append("password", password);
 
-  const res = await fetch(url, {
-    method: 'POST',
-    body: formData,
-    credentials: 'include', // Important: sends session cookie
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
+  const res = await fetch(`http://localhost:8000/api/accounts/${type}/login/`, {
+    method: "POST",
+    credentials: "include",
+    body: formData, // <-- send FormData here
+    // Don't set Content-Type manually! The browser sets it with the proper boundary
   });
+
+
 
   return res.json();
 };

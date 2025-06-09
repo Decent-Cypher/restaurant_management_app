@@ -1,4 +1,4 @@
-import { Search, User, Globe, ShoppingCart } from 'lucide-react';
+import { Search, User, Globe, ShoppingCart,  MessageSquare } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export default function OrderHeader() {
@@ -25,6 +25,12 @@ export default function OrderHeader() {
           <Globe className="w-6 h-6" />
           <span className="text-white">English</span>
         </div> */}
+        <div className="relative">
+          <MessageSquare onClick={() => navigate("/feedback")} className="w-6 h-6" />
+          {/* <span className="absolute -top-2 -right-2 bg-red-500 text-xs text-white w-5 h-5 rounded-full flex items-center justify-center">
+            2
+          </span> */}
+        </div>
         <div className="relative">
           <ShoppingCart onClick={() => navigate("/order/cart")} className="w-6 h-6" />
           {/* <span className="absolute -top-2 -right-2 bg-red-500 text-xs text-white w-5 h-5 rounded-full flex items-center justify-center">
