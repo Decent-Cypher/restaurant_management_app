@@ -44,6 +44,7 @@ urlpatterns = [
     path('api/accounts/diner/login/', account_views.diner_login, name='diner_login'),
     path('api/accounts/logout/', account_views.logout_view, name='logout'),
     path('api/accounts/protected/', account_views.protected_view, name='protected'),
+    path('api/accounts/diner/info/', account_views.get_diner_info, name='get_diner_info'),
 
     # Menu URLs (using router)
     path('api/menu/', include(menu_router.urls)),
