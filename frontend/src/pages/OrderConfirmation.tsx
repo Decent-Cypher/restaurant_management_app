@@ -125,7 +125,7 @@ export default function OrderConfirmation() {
                 <p className="font-semibold">Ordered items ({getTotalQuantity()})</p>
                 <div className="flex justify-between pt-2">
                   <span>Sub-total:</span>
-                  <span>{order.total_price} VND</span>
+                  <span>{order.total_price.toLocaleString()} VND</span>
                 </div>
                 {order.service_type === "Delivery" && (
                   <div className="flex justify-between items-center pt-1">

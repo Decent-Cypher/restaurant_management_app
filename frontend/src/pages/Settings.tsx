@@ -1,11 +1,13 @@
 import React from "react";
 import { FaUserTie, FaBars, FaUser, FaChartBar, FaShoppingCart, FaSignOutAlt, FaSmile} from "react-icons/fa";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { logout } from "../api/auth";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import OrderManagementTable from "../components/OrderManagementTable";
 import AnalyticsDashboard from "../components/AnalyticsDashboard";
+
+
 
 const SidebarItem = ({
   icon: Icon,
@@ -34,6 +36,7 @@ export default function Settings() {
   const [activePanel, setActivePanel] = useState("Personal Information");
   const navigate = useNavigate();
   const { fetchUser } = useAuth();
+
 
   const handleLogout = async () => {
     try {``

@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
 
 interface Order {
-  id: number;
-  diner_id: number;
-  status: string;
-  service_type: string;
-  total_price: number;
-  time_created: string;
-  items_count: number;
+  order_id: number,
+  diner_id: number,
+  status: string,
+  service_type: string,
+  total_price: number,
+  time_created: string,
+  items_count: number,
 }
 
 interface OrderManagementTableProps {
@@ -15,51 +15,48 @@ interface OrderManagementTableProps {
 }
 
 export default function OrderManagementTable({ className = "" }: OrderManagementTableProps) {
-  const [orders, setOrders] = useState<Order[]>([]);
   const [selectedOrders, setSelectedOrders] = useState<number[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [isAddingOrder, setIsAddingOrder] = useState<boolean>(false);
   const [isRemovingOrders, setIsRemovingOrders] = useState<boolean>(false);
 
-  // Fetch orders from API
+  const [orders, setOrders] = useState<Order[]>([])
   const fetchOrders = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      
-      const response = await fetch('http://localhost:8000/api/orders/diner/', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include', // Include cookies for authentication
-      });
+      // alert(`Fetching diner info... ${user.diner_id}`);
+      try {
+        const response = await fetch(`http://localhost:8000/api/orders/all/`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        });
 
-      if (!response.ok) {
-        throw new Error(`Failed to fetch orders: ${response.status}`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        if (data.status === "success") {
+          setOrders(data.orders);
+        } else {
+          alert("Failed to fetch orders");
+        }
+      } catch (error) {
+        console.error("Error fetching orders info:", error);
       }
+    };
 
-      const data: Order[] = await response.json();
-      setOrders(data);
-    } catch (err) {
-      console.error('Error fetching orders:', err);
-      setError(err instanceof Error ? err.message : 'Failed to load orders');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Load orders on component mount
   useEffect(() => {
     fetchOrders();
-  }, []);
-
+  }, []); 
+  alert(orders.length)
   // Handle order selection
   const handleSelectOrder = (orderId: number) => {
     setSelectedOrders(prev => 
       prev.includes(orderId) 
-        ? prev.filter(id => id !== orderId)
+        ? prev.filter(order_id => order_id !== orderId)
         : [...prev, orderId]
     );
   };
@@ -69,7 +66,7 @@ export default function OrderManagementTable({ className = "" }: OrderManagement
     if (selectedOrders.length === orders.length) {
       setSelectedOrders([]);
     } else {
-      setSelectedOrders(orders.map(order => order.id));
+      setSelectedOrders(orders.map(order => order.order_id));
     }
   };
 
@@ -150,7 +147,7 @@ export default function OrderManagementTable({ className = "" }: OrderManagement
       }
 
       // Remove successfully deleted orders from state
-      setOrders(prev => prev.filter(order => !selectedOrders.includes(order.id)));
+      setOrders(prev => prev.filter(order => !selectedOrders.includes(order.order_id)));
       setSelectedOrders([]);
       
       console.log(`Successfully removed ${selectedOrders.length} order(s)`);
@@ -292,17 +289,17 @@ export default function OrderManagementTable({ className = "" }: OrderManagement
                   </tr>
                 ) : (
                   orders.map((order) => (
-                    <tr key={order.id} className="hover:bg-gray-50">
+                    <tr key={order.order_id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <input
                           type="checkbox"
-                          checked={selectedOrders.includes(order.id)}
-                          onChange={() => handleSelectOrder(order.id)}
+                          checked={selectedOrders.includes(order.order_id)}
+                          onChange={() => handleSelectOrder(order.order_id)}
                           className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                         />
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        #{order.id}
+                        #{order.order_id}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                         #{order.diner_id}
