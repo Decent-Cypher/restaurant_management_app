@@ -14,6 +14,7 @@ import { CartProvider } from '../contexts/CartContext'
 import { AuthProvider } from '../contexts/AuthContext'
 import FeedbackPage from './Feedback'
 import Profile from './Profile'
+import Settings from './Settings'
 import ProtectedRoute from "../components/ProtectedRoute"
 
 const rootElement = document.getElementById('root');
@@ -60,6 +61,11 @@ if (rootElement) {
               <Route path="/profile" element={
                 <ProtectedRoute>
                   <Profile />
+                </ProtectedRoute>
+              } />
+              <Route path="/settings" element={
+                <ProtectedRoute>
+                  <Settings />
                 </ProtectedRoute>
               } />
               <Route path="/login" element={<Login />} />
