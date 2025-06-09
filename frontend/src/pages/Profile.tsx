@@ -3,6 +3,7 @@ import { FaSmile, FaMapMarkerAlt, FaBuilding, FaShoppingCart, FaPhone, FaFileInv
 import { useState } from "react";
 import { logout } from "../api/auth";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 
 const SidebarItem = ({
   icon: Icon,
@@ -30,11 +31,13 @@ const SidebarItem = ({
 export default function Profile() {
   const [activePanel, setActivePanel] = useState("Personal Information");
   const navigate = useNavigate();
+  const { fetchUser } = useAuth();
 
   const handleLogout = async () => {
     try {
       const data = await logout();
       if (data.success) {
+        await fetchUser();
         navigate("/");
       } else {
         alert("Logout failed. Please try again.");
