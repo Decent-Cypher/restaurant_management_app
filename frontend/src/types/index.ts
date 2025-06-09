@@ -32,3 +32,9 @@ export interface Order {
   note: string | null;
   items: CartItem[];
 }
+
+export interface Diner {
+  name: string;
+  email: string;
+  phone_number: string;
+}

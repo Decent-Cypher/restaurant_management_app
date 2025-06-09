@@ -1,9 +1,10 @@
 import React from "react";
 import { FaSmile, FaMapMarkerAlt, FaBuilding, FaShoppingCart, FaPhone, FaFileInvoice, FaFilePdf, FaVideo, FaWifi, FaGoogle, FaSignOutAlt } from "react-icons/fa";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { logout } from "../api/auth";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import { Diner } from "../types";
 
 const SidebarItem = ({
   icon: Icon,
@@ -32,6 +33,37 @@ export default function Profile() {
   const [activePanel, setActivePanel] = useState("Personal Information");
   const navigate = useNavigate();
   const { fetchUser } = useAuth();
+  const [dinerInfo, setDinerInfo] = useState<Diner | null>(null);
+
+
+  useEffect(() => {
+    const fetchDinerInfo = async () => {
+      try {
+        const response = await fetch("http://localhost:8000/api/accounts/diner/info/", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include", 
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        if (data.success) {
+          setDinerInfo(data.diner_info);
+        } else {
+          alert("Failed to fetch diner info.");
+        }
+      } catch (error) {
+        console.error("Error fetching diner info:", error);
+      }
+    };
+
+    fetchDinerInfo();
+  }, []); 
 
   const handleLogout = async () => {
     try {
@@ -55,43 +87,28 @@ export default function Profile() {
             <h2 className="text-2xl font-semibold mb-6">Personal Information</h2>
             <div className="grid grid-cols-2 gap-6">
               <div>
-                <label className="block font-semibold mb-1">First name</label>
-                <input type="text" disabled className="w-full bg-gray-100 p-2 rounded" />
+                <label className="block font-semibold mb-1">Name</label>
+                <input type="text" value={dinerInfo.name || ""} disabled className="w-full bg-gray-100 p-2 rounded" />
               </div>
-              <div>
-                <label className="block font-semibold mb-1">Last name</label>
-                <input type="text" value="Tran" disabled className="w-full bg-gray-100 p-2 rounded" />
-              </div>
-              <div>
-                <label className="block font-semibold mb-1">Nick name</label>
-                <input type="text" disabled className="w-full bg-gray-100 p-2 rounded" />
-              </div>
+
               <div>
                 <label className="block font-semibold mb-1">Phone number</label>
                 <div className="flex">
                   <span className="bg-gray-200 px-3 py-2 rounded-l text-sm">(+84)</span>
-                  <input type="text" disabled className="w-full bg-gray-100 p-2 rounded-r" />
+                  <input type="text" value={dinerInfo.phone_number || ""} disabled className="w-full bg-gray-100 p-2 rounded-r" />
                 </div>
               </div>
-              <div>
-                <label className="block font-semibold mb-1">Birthday</label>
-                <input type="text" value="13/06/2002" disabled className="w-full bg-gray-100 p-2 rounded" />
-              </div>
-              <div>
-                <label className="block font-semibold mb-1">Gender</label>
-                <select disabled className="w-full bg-gray-100 p-2 rounded">
-                  <option>Female</option>
-                </select>
-              </div>
+
               <div className="col-span-2">
                 <label className="block font-semibold mb-1">Email address</label>
                 <div className="flex">
                   <span className="bg-gray-200 px-3 py-2 rounded-l">
                     <FaGoogle />
                   </span>
-                  <input type="text" disabled className="w-full bg-gray-100 p-2 rounded-r" />
+                  <input type="text" value={dinerInfo.email || ""} disabled className="w-full bg-gray-100 p-2 rounded-r" />
                 </div>
               </div>
+              
             </div>
             <div className="mt-6">
               <button className="bg-[#1a2a5b] text-white font-semibold py-2 px-6 rounded-full shadow-md hover:bg-[#16224a]">
