@@ -8,6 +8,8 @@ def staff_login(request: HttpRequest) -> JsonResponse:
     """
     Example staff login view that sets a session cookie on success.
     """
+    # print(request.session.keys())
+    # print(request.session.items())
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
@@ -30,6 +32,9 @@ def staff_login(request: HttpRequest) -> JsonResponse:
 
 @csrf_exempt
 def diner_login(request: HttpRequest) -> JsonResponse:
+    
+    # print(request.session.keys())
+    # print(request.session.items())
     """
     Example diner login view that sets a session cookie on success.
     """
@@ -85,6 +90,8 @@ def get_diner_info(request: HttpRequest) -> JsonResponse:
     """
     Returns diner information
     """
+    print(request.session.keys())
+    print(request.session.items())
     if request.method == "GET":
         if 'diner_id' in request.session:
             diner_id = request.GET.get('diner_id')
