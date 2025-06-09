@@ -2,6 +2,7 @@ import React from 'react';
 
 interface FoodItemProps {
   name: string;
+  description?: string;
   price: string;
   image: string;
 }
