@@ -387,12 +387,14 @@ def get_diner_orders(request: HttpResponse) -> JsonResponse:
     """
     # Security check: Logged-in diner must match diner_id or be staff
     diner_id = request.GET.get("diner_id")
+    print(diner_id)
     try:
         diner_id = int(diner_id) if diner_id else None
     except ValueError:
         return JsonResponse({"status": "error", "message": "Invalid diner ID"}, status=400)
     if not diner_id:
         return JsonResponse({"status": "error", "message": "Diner ID is required"}, status=400)
+    print("Request Item:", request.session.items())
     if "diner_id" in request.session and request.session["diner_id"] == diner_id:
         pass # Diner is accessing their own orders
     elif "staff_id" in request.session:
