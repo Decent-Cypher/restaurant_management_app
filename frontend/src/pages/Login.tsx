@@ -49,7 +49,7 @@ export default function Login() {
     
     try {
       // Only customers can sign up
-      const response = await fetch("http://localhost:8000/api/accounts/diner/signup/", {
+      const response = await fetch("http://localhost:8000/api/accounts/diner/login/", {
         method: "POST",
         headers: { 
           "Content-Type": "application/x-www-form-urlencoded" 

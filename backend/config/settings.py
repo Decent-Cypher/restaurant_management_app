@@ -65,6 +65,11 @@ CORS_ALLOWED_ORIGINS = [
 ]
 CORS_ALLOW_CREDENTIALS = True
 
+SESSION_COOKIE_SAMESITE = 'Lax'     # or 'None' if using HTTPS
+SESSION_COOKIE_SECURE = False      # switch to True in production HTTPS
+CSRF_COOKIE_SAMESITE = 'Lax'
+CSRF_COOKIE_SECURE = False
+
 ROOT_URLCONF = 'config.urls'
 
 TEMPLATES = [

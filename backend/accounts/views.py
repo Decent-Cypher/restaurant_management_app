@@ -31,6 +31,7 @@ def diner_login(request: HttpRequest) -> JsonResponse:
     """
     Example diner login view that sets a session cookie on success.
     """
+    print(request.session.items())
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
@@ -42,10 +43,10 @@ def diner_login(request: HttpRequest) -> JsonResponse:
         if diner.check_password(password):
             # Store diner ID in session
             request.session['diner_id'] = diner.id
+            print(request.session.items())
             return JsonResponse({'success': True})
         else:
             return JsonResponse({'success': False, 'error': 'Invalid credentials'}, status=400)
-
     return JsonResponse({'error': 'Only POST allowed'}, status=405)
 
 @csrf_exempt
@@ -80,6 +81,7 @@ def get_diner_info(request: HttpRequest) -> JsonResponse:
     """
     Returns diner information
     """
+    print(request.session.items())
     if request.method == "GET":
         if 'diner_id' in request.session:
             diner_id = request.GET.get('diner_id')
@@ -159,6 +161,9 @@ def update_roles(request: HttpRequest) -> JsonResponse:
     """
     Update staff roles
     """
+    print("Session items:", list(request.session.items()))
+    print(request.method)
+    print("Incoming cookies:", request.COOKIES)
     if request.method == "POST":
         if 'staff_id' in request.session:
             staff = Staff.objects.get(id=request.session['staff_id'])

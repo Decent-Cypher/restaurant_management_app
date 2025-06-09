@@ -88,3 +88,34 @@ def remove_menu_items(request: HttpResponse) -> JsonResponse:
         else:
             return JsonResponse({"status": "error", "message": "Unauthorized access"}, status=403)
     return JsonResponse({"status": "error", "message": "Invalid request method"}, status=405)
+
+@csrf_exempt
+def change_item_info(request: HttpResponse) -> JsonResponse:
+    """
+    Change Menu Item Info based on description, price
+    """
+    if request.method == "POST":
+        if 'staff_id' in request.session:
+            staff = Staff.objects.get(id=request.session['staff_id'])
+            if staff.role == 'Manager':
+                item_id = request.POST.get("item_id")
+                if not item_id:
+                    return JsonResponse({"status": "error", "message": "Missing required fields"}, status=400)
+
+                try:
+                    item = MenuItem.objects.get(id=item_id)
+                    description = request.POST.get("description")
+                    price = request.POST.get("price")
+
+                    if description:
+                        item.description = description
+                    if price:
+                        item.price = round(float(price), 2)
+                    
+                except MenuItem.DoesNotExist:
+                    return JsonResponse({"status": "error", "message": "Menu item not found"}, status=404)
+            else:
+                return JsonResponse({"status": "error", "message": "Unauthorized access"}, status=403)
+        else:
+            return JsonResponse({"status": "error", "message": "Unauthorized access"}, status=403)
+    return JsonResponse({"status": "error", "message": "Invalid request method"}, status=405)
