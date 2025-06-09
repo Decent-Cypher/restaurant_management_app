@@ -59,6 +59,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+SESSION_COOKIE_SAMESITE = None
+SESSION_COOKIE_SECURE = False 
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
