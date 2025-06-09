@@ -8,7 +8,7 @@ __pycache__/
 *.swo
 .DS_Store
 .env
-
+cookies.txt
 # Python
 *.env
 *.venv
