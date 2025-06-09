@@ -48,15 +48,20 @@ def diner_login(request: HttpRequest) -> JsonResponse:
 
     return JsonResponse({'error': 'Only POST allowed'}, status=405)
 
+@csrf_exempt
 def logout_view(request: HttpRequest) -> JsonResponse:
     """
     Logs out either a staff or diner by clearing the session.
     """
     if request.method == 'POST':
-        request.session.flush()  # Clears all session data
-        return JsonResponse({'success': True})
+        try:
+            request.session.flush()  # Clears all session data
+            return JsonResponse({'success': True}, status = 200)
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)}, status=500)
     return JsonResponse({'error': 'Only POST allowed'}, status=405)
 
+@csrf_exempt
 def protected_view(request: HttpRequest) -> JsonResponse:
     """
     Example view that requires a staff or diner to be logged in.
