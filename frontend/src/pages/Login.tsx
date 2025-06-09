@@ -1,5 +1,10 @@
 import Layout from "../components/Layout";
 import { useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
+import { login } from "../api/auth";
+
+const MAPPING = {"customer": "diner", "staff": "staff", "manager": "staff"};
 
 export default function Login() {
   const [userType, setUserType] = useState<string>("customer");
@@ -8,6 +13,10 @@ export default function Login() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState<boolean>(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from?.pathname || "/";
+  const { fetchUser } = useAuth();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -15,30 +24,12 @@ export default function Login() {
     setError(null);
     
     try {
-      // Determine the correct endpoint based on user type
-      const endpoint = userType === "customer" 
-        ? "http://localhost:8000/api/accounts/diner/login/"
-        : "http://localhost:8000/api/accounts/staff/login/";
-      
-      const response = await fetch(endpoint, {
-        method: "POST",
-        headers: { 
-          "Content-Type": "application/x-www-form-urlencoded" 
-        },
-        credentials: "include",
-        body: new URLSearchParams({ 
-          username, 
-          password 
-        })
-      });
-      
-      const data = await response.json();
+      const data = await login(MAPPING[userType], username, password);
       
       if (data.success) {
         console.log("Login successful:", data);
-        // Handle successful login - redirect or update state as needed
-        // You might want to store user info in context/state management
-        // window.location.href = "/dashboard"; // Example redirect
+        await fetchUser();
+        navigate(from, { replace: true });
       } else {
         setError(data.error || "Login failed");
       }

@@ -1,4 +1,4 @@
-import { StrictMode } from 'react'
+import { StrictMode, useEffect } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import App from './App'
@@ -10,31 +10,66 @@ import OrderMenu from './OrderMenu'
 import CartSummary from './CartSummary'
 import OrderConfirmation from './OrderConfirmation'
 import Payment from './Payment'
-import { CartProvider } from '../contexts/CartContext'; 
+import { CartProvider } from '../contexts/CartContext'
+import { AuthProvider } from '../contexts/AuthContext'
 import FeedbackPage from './Feedback'
+import Profile from './Profile'
+import ProtectedRoute from "../components/ProtectedRoute"
 
 const rootElement = document.getElementById('root');
+
 if (rootElement) {
   createRoot(rootElement).render(
     <StrictMode>
       <BrowserRouter>
-        <CartProvider>
-          <Routes>
-            <Route path="/" element={<App />} />
-            <Route path="/menu" element={<Menu />} />
-            <Route path="/order" element={<Order />} />
-            <Route path="/order/menu" element={<OrderMenu />} />
-            <Route path="/order/cart" element={<CartSummary />} />
-            <Route path="/order/confirmation/:orderId" element={<OrderConfirmation />} />
-            <Route path="/order/payment/:orderId" element={<Payment />} />
-            <Route path="/feedback" element={<FeedbackPage />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </CartProvider>
+        <AuthProvider>
+          <CartProvider>
+            <Routes>
+              <Route path="/" element={<App />} />
+              <Route path="/menu" element={<Menu />} />
+              <Route path="/order" element={
+                <ProtectedRoute>
+                  <Order />
+                </ProtectedRoute>
+              } />
+              <Route path="/order/menu" element={
+                <ProtectedRoute>
+                  <OrderMenu />
+                </ProtectedRoute>
+              } />
+              <Route path="/order/cart" element={
+                <ProtectedRoute>
+                  <CartSummary />
+                </ProtectedRoute>
+              } />
+              <Route path="/order/confirmation/:orderId" element={
+                <ProtectedRoute>
+                  <OrderConfirmation />
+                </ProtectedRoute>
+              } />
+              <Route path="/order/payment/:orderId" element={
+                <ProtectedRoute>
+                  <Payment />
+                </ProtectedRoute>
+              } />
+              <Route path="/feedback" element={
+                <ProtectedRoute>
+                  <FeedbackPage />
+                </ProtectedRoute>
+              } />
+              <Route path="/profile" element={
+                <ProtectedRoute>
+                  <Profile />
+                </ProtectedRoute>
+              } />
+              <Route path="/login" element={<Login />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </CartProvider>
+        </AuthProvider>
       </BrowserRouter>
     </StrictMode>,
-    );
+  );
 } else {
   console.error('Root element not found');
 }

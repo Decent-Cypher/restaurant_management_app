@@ -20,7 +20,7 @@ export default function OrderHeader() {
 
       {/* Right: Icons */}
       <div className="flex items-center gap-12 ml-12 mr-6">
-        <User className="w-6 h-6" />
+        <User onClick={() => navigate("/profile")} className="w-6 h-6" />
         {/* <div className="flex items-center gap-1">
           <Globe className="w-6 h-6" />
           <span className="text-white">English</span>
