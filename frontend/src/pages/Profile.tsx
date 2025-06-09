@@ -1,9 +1,18 @@
-import React from "react";
-import { FaSmile, FaMapMarkerAlt, FaBuilding, FaShoppingCart, FaPhone, FaFileInvoice, FaFilePdf, FaVideo, FaWifi, FaGoogle, FaSignOutAlt } from "react-icons/fa";
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
+import {
+  FaSmile, FaShoppingCart, FaSignOutAlt, FaGoogle
+} from "react-icons/fa";
 import { logout } from "../api/auth";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+
+interface Order {
+  order_id: string;
+  time_created: string;
+  items_count: number;
+  total_price: string;
+  status: string;
+}
 
 const SidebarItem = ({
   icon: Icon,
@@ -27,11 +36,38 @@ const SidebarItem = ({
   </div>
 );
 
-
 export default function Profile() {
   const [activePanel, setActivePanel] = useState("Personal Information");
   const navigate = useNavigate();
-  const { fetchUser } = useAuth();
+  const { fetchUser, user } = useAuth();
+
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [loadingOrders, setLoadingOrders] = useState(true);
+  const [orderError, setOrderError] = useState("");
+
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const response = await fetch(`http://localhost:8000/api/orders/diner/?diner_id=${user?.diner_id}`, {
+        method: "GET",
+      });
+        const data = await response.json();
+        if (data.status === "success") {
+          setOrders(data.orders);
+        } else {
+          setOrderError(data.message || "Failed to fetch orders.");
+        }
+      } catch (err) {
+        setOrderError("Error fetching order history.");
+      } finally {
+        setLoadingOrders(false);
+      }
+    };
+
+    if (user?.diner_id && activePanel === "Order History") {
+      fetchOrders();
+    }
+  }, [user?.diner_id, activePanel]);
 
   const handleLogout = async () => {
     try {
@@ -100,7 +136,11 @@ export default function Profile() {
             </div>
           </>
         );
+
       case "Order History":
+        if (loadingOrders) return <div>Loading order history...</div>;
+        if (orderError) return <div className="text-red-600">Error: {orderError}</div>;
+
         return (
           <div>
             <h2 className="text-2xl font-semibold mb-6">🛒 Order History</h2>
@@ -117,20 +157,18 @@ export default function Profile() {
                   </tr>
                 </thead>
                 <tbody className="divide-y">
-                  {[
-                    { no: "000731", date: "5/9/2022", items: "1", total: "€ 4.094,99", status: "Pending" },
-                    { no: "000730", date: "5/9/2022", items: "2", total: "€ 1.660,00", status: "Pending" },
-                    { no: "000729", date: "12/7/2021", items: "3", total: "€ 147,59", status: "Complete" },
-                  ].map((order) => (
-                    <tr key={order.no} className="hover:bg-gray-50">
-                      <td className="px-4 py-2">{order.no}</td>
-                      <td className="px-4 py-2">{order.date}</td>
-                      <td className="px-4 py-2">{order.items}</td>
-                      <td className="px-4 py-2">{order.total}</td>
+                  {orders.map((order) => (
+                    <tr key={order.order_id} className="hover:bg-gray-50">
+                      <td className="px-4 py-2">{order.order_id}</td>
+                      <td className="px-4 py-2">{new Date(order.time_created).toLocaleDateString()}</td>
+                      <td className="px-4 py-2">{order.items_count}</td>
+                      <td className="px-4 py-2">€ {Number(order.total_price).toLocaleString()}</td>
                       <td className="px-4 py-2">
                         <span
                           className={`inline-block px-2 py-1 rounded-full text-xs font-semibold ${
-                            order.status === "Pending" ? "bg-yellow-100 text-yellow-800" : "bg-green-100 text-green-800"
+                            order.status === "Pending"
+                              ? "bg-yellow-100 text-yellow-800"
+                              : "bg-green-100 text-green-800"
                           }`}
                         >
                           {order.status}
@@ -144,9 +182,6 @@ export default function Profile() {
             </div>
           </div>
         );
-
-      default:
-        return null;
     }
   };
 
@@ -173,18 +208,20 @@ export default function Profile() {
           />
         </div>
         <div className="mt-auto px-4 pt-6">
-          <button onClick={handleLogout} className="flex items-center gap-2 text-[#1a2a5b] font-semibold hover:underline">
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-2 text-[#1a2a5b] font-semibold hover:underline"
+          >
             <FaSignOutAlt />
             Log out
           </button>
         </div>
       </div>
 
-      {/* Personal Info Panel */}
+      {/* Main Content */}
       <div className="flex-1 bg-white shadow-md rounded-xl m-4 px-8 py-6">
         {renderPanel()}
       </div>
     </div>
   );
-};
-
+}
