@@ -76,6 +76,7 @@ def get_diner_info(request: HttpRequest) -> JsonResponse:
     """
     Returns diner information
     """
+    print(request.session.items())
     if request.method == "GET":
         if 'staff_id' in request.session:
             staff = Staff.objects.get(id=request.session['staff_id'])
@@ -96,6 +97,37 @@ def get_diner_info(request: HttpRequest) -> JsonResponse:
             else:
                 return JsonResponse({"status": "error", "message": "Unauthorized access"}, status=403)
         else:
+            return JsonResponse({"status": "error", "message": "Unauthorized access"}, status=403)
+    return JsonResponse({"status": "error", "message": "Invalid request method"}, status=405)
+
+
+@csrf_exempt
+def add_accounts(request: HttpRequest) -> JsonResponse:
+    """
+    Add account for new staff -> Store to diner database
+    """
+    print(request.session.items())
+    if request.method == "POST":
+        if 'staff_id' in request.session:
+            staff = Staff.objects.get(id=request.session['staff_id'])
+            if staff.role == 'Manager':
+                name = request.POST.get("name")
+                role = request.POST.get("role")
+                email = request.POST.get("email")
+                if not name or not role or not email:
+                    return JsonResponse({"status": "error", "message": "Missing required fields"}, status=400)
+                if not role in ['Manager', 'Waiter', 'Chef']:
+                    return JsonResponse({"status": "error", "message": "Invalid role"}, status=400)
+                new_staff = Staff(
+                    name=name,
+                    role=role,
+                    email=email,
+                )
+                new_staff.save()
+            else:
+                return JsonResponse({"status": "error", "message": "Unauthorized access"}, status=403)
+        else:
+            print("YEAH")
             return JsonResponse({"status": "error", "message": "Unauthorized access"}, status=403)
     return JsonResponse({"status": "error", "message": "Invalid request method"}, status=405)
             
