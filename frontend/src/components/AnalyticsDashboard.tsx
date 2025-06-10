@@ -159,6 +159,30 @@ export default function AnalyticsDashboard({ className = "" }: AnalyticsDashboar
   };
 
   // Fetch revenue data separately
+  const convertRevenueToNumber = (value: any): number => {
+    if (typeof value === 'number') {
+      return value;
+    }
+    if (typeof value === 'string') {
+      const parsed = parseFloat(value);
+      return isNaN(parsed) ? 0 : parsed;
+    }
+    return 0;
+  };
+  
+  // Helper function to process and normalize revenue data
+  const normalizeRevenueData = (data: any): RevenueData => {
+    return {
+      status: data.status || "success",
+      total_revenue: convertRevenueToNumber(data.total_revenue),
+      monthly_revenue: (data.monthly_revenue || []).map((item: any) => ({
+        month: item.month,
+        total_revenue: convertRevenueToNumber(item.total_revenue)
+      }))
+    };
+  };
+  
+  // Fetch revenue data separately
   const fetchRevenueData = async () => {
     try {
       setRevenueError(null);
@@ -166,18 +190,24 @@ export default function AnalyticsDashboard({ className = "" }: AnalyticsDashboar
       const startParam = formatDateForAPI(fromDate);
       const endParam = formatDateForAPI(toDate);
       const revenueUrl = `http://localhost:8000/api/analytics/revenue/?start=${encodeURIComponent(startParam)}&end=${encodeURIComponent(endParam)}`;
-
+  
       const response = await fetch(revenueUrl, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
       });
-
+  
       if (!response.ok) {
         throw new Error(`Failed to fetch revenue data: ${response.status}`);
       }
-
-      const result: RevenueData = await response.json();
+  
+      const rawResult = await response.json();
+      console.log('Raw revenue data from API:', rawResult); // Debug log
+      
+      // Normalize the data to ensure proper number types
+      const result: RevenueData = normalizeRevenueData(rawResult);
+      console.log('Normalized revenue data:', result); // Debug log
+      
       setRevenueData(result);
     } catch (err) {
       console.error('Error fetching revenue data:', err);
