@@ -36,8 +36,10 @@ interface FoodCategory {
 
 export default function Menu() {
   const [menuCategories, setMenuCategories] = useState<FoodCategory[]>([]);
+  const [filteredCategories, setFilteredCategories] = useState<FoodCategory[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState<string>("");
 
   // Dummy menu data for error state
   const dummyMenuCategories: FoodCategory[] = [
@@ -151,6 +153,38 @@ export default function Menu() {
     },
   ];
 
+  // Filter function for menu items
+  const filterMenuItems = (categories: FoodCategory[], searchTerm: string): FoodCategory[] => {
+    if (!searchTerm.trim()) {
+      return categories;
+    }
+
+    const lowerSearchTerm = searchTerm.toLowerCase();
+
+    return categories
+      .map(category => ({
+        ...category,
+        items: category.items.filter(item => 
+          item.name.toLowerCase().includes(lowerSearchTerm) ||
+          item.description.toLowerCase().includes(lowerSearchTerm)
+        )
+      }))
+      .filter(category => category.items.length > 0); // Only show categories that have matching items
+  };
+
+  // Handle search input changes
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+    setFilteredCategories(filterMenuItems(menuCategories, value));
+  };
+
+  // Clear search
+  const clearSearch = () => {
+    setSearchTerm("");
+    setFilteredCategories(menuCategories);
+  };
+
   useEffect(() => {
     const fetchMenuData = async () => {
       try {
@@ -196,11 +230,13 @@ export default function Menu() {
         });
 
         setMenuCategories(categorizedMenus);
+        setFilteredCategories(categorizedMenus);
       } catch (err) {
         console.error('Error fetching menu data:', err);
         setError(err instanceof Error ? err.message : 'Failed to load menu data');
         // Set dummy data when there's an error
         setMenuCategories(dummyMenuCategories);
+        setFilteredCategories(dummyMenuCategories);
       } finally {
         setLoading(false);
       }
@@ -208,6 +244,11 @@ export default function Menu() {
 
     fetchMenuData();
   }, []);
+
+  // Update filtered categories when menu categories change
+  useEffect(() => {
+    setFilteredCategories(filterMenuItems(menuCategories, searchTerm));
+  }, [menuCategories, searchTerm]);
 
   // Loading state
   if (loading) {
@@ -235,7 +276,7 @@ export default function Menu() {
           
           {/* Error message displayed under header when there's an error */}
           {error && (
-            <div className="max-w-4xl mx-auto mb-12 px-4">
+            <div className="max-w-4xl mx-auto mb-8 px-4">
               <div className="bg-red-50 border border-red-200 rounded-lg p-4">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
@@ -260,18 +301,58 @@ export default function Menu() {
               </div>
             </div>
           )}
+
+          {/* Search Bar */}
+          <div className="max-w-4xl mx-auto mb-12 px-4">
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <svg className="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </div>
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={handleSearchChange}
+                placeholder="Search menu items..."
+                className="w-full pl-12 pr-12 py-4 text-lg text-gray-600 border border-gray-300 rounded-full bg-white shadow-sm focus:ring-2 focus:ring-gray-500 focus:border-gray-500 outline-none transition-all duration-200"
+              />
+              {searchTerm && (
+                <button
+                  onClick={clearSearch}
+                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
+                  type="button"
+                >
+                  <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              )}
+            </div>
+            {searchTerm && (
+              <div className="mt-2 text-sm text-gray-600 text-center">
+                {filteredCategories.reduce((total, category) => total + category.items.length, 0)} item(s) found for "{searchTerm}"
+              </div>
+            )}
+          </div>
           
-          {menuCategories.length === 0 ? (
+          {/* Menu Categories */}
+          {filteredCategories.length === 0 ? (
             <div className="text-center text-gray-600 text-xl">
-              No menu items available at the moment.
+              {searchTerm ? `No menu items found for "${searchTerm}"` : "No menu items available at the moment."}
             </div>
           ) : (
-            menuCategories.map((category) => (
+            filteredCategories.map((category) => (
               <div key={category.id} className="mb-16">
                 <div className="flex items-center justify-between mb-6">
                   <div className="lg:pl-32 pl-4">
                     <h2 className="lg:text-4xl text-2xl font-semibold text-gray-800 mb-2">
                       {category.name}
+                      {searchTerm && (
+                        <span className="text-lg text-gray-500 ml-2">
+                          ({category.items.length} item{category.items.length !== 1 ? 's' : ''})
+                        </span>
+                      )}
                     </h2>
                     {category.description && (
                       <p className="text-gray-600 text-lg">
