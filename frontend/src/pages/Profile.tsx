@@ -1,10 +1,18 @@
-import React from "react";
-import { FaSmile, FaMapMarkerAlt, FaBuilding, FaShoppingCart, FaPhone, FaFileInvoice, FaFilePdf, FaVideo, FaWifi, FaGoogle, FaSignOutAlt } from "react-icons/fa";
-import { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import {
+  FaSmile, FaShoppingCart, FaSignOutAlt, FaGoogle
+} from "react-icons/fa";
 import { logout } from "../api/auth";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
-import { Diner } from "../types";
+
+interface Order {
+  order_id: string;
+  time_created: string;
+  items_count: number;
+  total_price: string;
+  status: string;
+}
 
 const SidebarItem = ({
   icon: Icon,
@@ -31,45 +39,37 @@ const SidebarItem = ({
 export default function Profile() {
   const [activePanel, setActivePanel] = useState("Personal Information");
   const navigate = useNavigate();
-  const { user, fetchUser } = useAuth();
-  const [dinerInfo, setDinerInfo] = useState<Diner>({
-    name: "",
-    email: "",
-    phone_number: "",
-  });
+  const { fetchUser, user } = useAuth();
+
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [loadingOrders, setLoadingOrders] = useState(true);
+  const [orderError, setOrderError] = useState("");
 
   useEffect(() => {
-    const fetchDinerInfo = async () => {
-      // alert(`Fetching diner info... ${user.diner_id}`);
+    const fetchOrders = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/api/accounts/diner/info/?diner_id=${user.diner_id}`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-        });
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
+        const response = await fetch(`http://localhost:8000/api/orders/diner/?diner_id=${user?.diner_id}`, {
+        method: "GET",
+        credentials: "include",
+      });
         const data = await response.json();
         if (data.status === "success") {
-          setDinerInfo(data.diner_info);
+          setOrders(data.orders);
         } else {
-          alert("Failed to fetch diner info.");
+          setOrderError(data.message || "Failed to fetch orders.");
         }
-      } catch (error) {
-        console.error("Error fetching diner info:", error);
+      } catch (err) {
+        setOrderError("Error fetching order history.");
+      } finally {
+        setLoadingOrders(false);
       }
     };
-    
-    if (user) {
-      fetchDinerInfo();
+
+    if (user?.diner_id && activePanel === "Order History") {
+      fetchOrders();
     }
-  }, [user]); 
-  
+  }, [user?.diner_id, activePanel]);
+
   const handleLogout = async () => {
     try {
       const data = await logout();
@@ -92,28 +92,43 @@ export default function Profile() {
             <h2 className="text-2xl font-semibold mb-6">Personal Information</h2>
             <div className="grid grid-cols-2 gap-6">
               <div>
-                <label className="block font-semibold mb-1">Name</label>
-                <input type="text" value={dinerInfo.name || ""} disabled className="w-full bg-gray-100 p-2 rounded" />
+                <label className="block font-semibold mb-1">First name</label>
+                <input type="text" disabled className="w-full bg-gray-100 p-2 rounded" />
               </div>
-
+              <div>
+                <label className="block font-semibold mb-1">Last name</label>
+                <input type="text" value="Tran" disabled className="w-full bg-gray-100 p-2 rounded" />
+              </div>
+              <div>
+                <label className="block font-semibold mb-1">Nick name</label>
+                <input type="text" disabled className="w-full bg-gray-100 p-2 rounded" />
+              </div>
               <div>
                 <label className="block font-semibold mb-1">Phone number</label>
                 <div className="flex">
                   <span className="bg-gray-200 px-3 py-2 rounded-l text-sm">(+84)</span>
-                  <input type="text" value={dinerInfo.phone_number || ""} disabled className="w-full bg-gray-100 p-2 rounded-r" />
+                  <input type="text" disabled className="w-full bg-gray-100 p-2 rounded-r" />
                 </div>
               </div>
-
+              <div>
+                <label className="block font-semibold mb-1">Birthday</label>
+                <input type="text" value="13/06/2002" disabled className="w-full bg-gray-100 p-2 rounded" />
+              </div>
+              <div>
+                <label className="block font-semibold mb-1">Gender</label>
+                <select disabled className="w-full bg-gray-100 p-2 rounded">
+                  <option>Female</option>
+                </select>
+              </div>
               <div className="col-span-2">
                 <label className="block font-semibold mb-1">Email address</label>
                 <div className="flex">
                   <span className="bg-gray-200 px-3 py-2 rounded-l">
                     <FaGoogle />
                   </span>
-                  <input type="text" value={dinerInfo.email || ""} disabled className="w-full bg-gray-100 p-2 rounded-r" />
+                  <input type="text" disabled className="w-full bg-gray-100 p-2 rounded-r" />
                 </div>
               </div>
-              
             </div>
             <div className="mt-6">
               <button className="bg-[#1a2a5b] text-white font-semibold py-2 px-6 rounded-full shadow-md hover:bg-[#16224a]">
@@ -177,7 +192,7 @@ export default function Profile() {
       <div className="w-[280px] bg-white shadow-md rounded-xl m-4 flex flex-col py-6">
         <div className="flex flex-col items-center">
           <FaSmile className="text-4xl mb-2 text-gray-700" />
-          <span className="font-semibold text-lg">{dinerInfo.name}</span>
+          <span className="font-semibold text-lg">Khanh Tran</span>
         </div>
         <div className="mt-6 space-y-2">
           <SidebarItem
